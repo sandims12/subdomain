@@ -1,0 +1,34 @@
+body {
+    background: linear-gradient(120deg, #0d6efd, #007bff);
+    background-attachment: fixed;
+    font-family: 'Poppins', sans-serif;
+  }
+  .register-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    padding: 2.5rem;
+    margin-top: 60px;
+  }
+  .register-header img {
+    max-width: 100px;
+  }
+  .btn-primary {
+    border-radius: 30px;
+  }
+  .password-rules {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #555;
+  }
+  .input-group-text {
+    background: transparent;
+    border-left: none;
+    cursor: pointer;
+  }
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #0d6efd;
+  }

@@ -1,0 +1,121 @@
+body {
+    background: linear-gradient(135deg, #0d6efd 40%, #98caff 90%);
+    background-attachment: fixed;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  
+  .login-card {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.992);
+    padding: 2.8rem;
+    max-width: 400px;
+    width: 100%;
+    margin-top: 70px;
+    margin-bottom: 70px;
+    
+  }
+  
+  .login-header img {
+    max-width: 115px;
+    margin-bottom: 10px;
+  }
+  
+  .login-header h5 {
+    margin-top: 0.3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #0048ff, #00aaff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1.5px;
+    font-size: 1.2rem;
+  }
+  
+  .login-header h4 {
+    font-weight: 700;
+    color: #0d6efd;
+    margin-top: 0.2rem;
+  }
+  
+  .login-header p {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 1.8rem;
+  }
+  
+  .btn-primary {
+    border-radius: 30px;
+  }
+  
+  .small-link a {
+    color: #0d6efd;
+    text-decoration: none;
+  }
+  
+  .small-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .captcha-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    font-size: 20px;
+    padding: 8px 0;
+    user-select: none;
+    color: #333;
+  }
+  
+  .refresh-btn {
+    border: none;
+    background: transparent;
+    color: #0d6efd;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 5px;
+  }
+  
+  .refresh-btn:hover {
+    text-decoration: underline;
+  }
+  
+  .password-wrapper {
+    position: relative;
+  }
+  
+  .password-wrapper i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+  }
+  
+  .password-wrapper i:hover {
+    color: #0d6efd;
+  }
+  
+  .alert {
+    border-radius: 10px;
+    animation: fadeIn 0.4s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @media (max-height: 700px) {
+    .login-card {
+      margin-top: 15px;
+      padding: 2rem;
+    }
+  }
+  
