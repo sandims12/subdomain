@@ -25,6 +25,18 @@
                 🌐 Subdomain Aktif
             </a>
         </li>
+
+        <!-- Menambahkan Kategori dan Subkategori -->
+        <li>
+            <a href="/admin/categories" class="nav-link text-dark">
+                📂 Kategori
+            </a>
+        </li>
+        <li>
+            <a href="/admin/subcategories" class="nav-link text-dark">
+                📂 Subkategori
+            </a>
+        </li>
     </ul>
 
     <hr>

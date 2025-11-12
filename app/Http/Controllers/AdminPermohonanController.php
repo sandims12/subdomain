@@ -5,19 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Permohonan;
 use App\Models\Subdomain;
+use App\Models\Category;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AdminPermohonanController extends Controller
 {
     public function index()
     {
-        $permohonan = Permohonan::with('skpd')->latest()->get();
+        $permohonan = Permohonan::with('skpd', 'category', 'subcategory')->latest()->get();
         return view('admin.permohonan.index', compact('permohonan'));
     }
 
     public function show($id)
     {
-        $permohonan = Permohonan::with('skpd')->findOrFail($id);
+        $permohonan = Permohonan::with('skpd', 'category', 'subcategory')->findOrFail($id);
         return view('admin.permohonan.show', compact('permohonan'));
     }
 

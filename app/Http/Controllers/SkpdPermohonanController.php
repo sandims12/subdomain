@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Permohonan;
+use App\Models\Category;
+use App\Models\Subcategory;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SkpdPermohonanController extends Controller
@@ -12,12 +14,17 @@ class SkpdPermohonanController extends Controller
     /**
      * Form pengajuan permohonan baru
      */
-    public function create()
-    {
-        return view('skpd.layouts.wrapper', [
-            'content' => 'skpd.permohonan.create',
-        ]);
-    }
+public function create()
+{
+    // Ambil semua kategori untuk dropdown
+    $categories = Category::all();
+
+    // Ambil semua subkategori untuk dikirim ke JavaScript
+    $subcategories = Subcategory::all();
+
+    return view('skpd.permohonan.create', compact('categories', 'subcategories'));
+}
+
 
     /**
      * Simpan permohonan baru
@@ -25,8 +32,9 @@ class SkpdPermohonanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
             'nama_subdomain' => 'required|string|max:255',
-            'file_pengajuan' => 'nullable|mimes:pdf,doc,docx|max:2048',
         ]);
 
         $user = Auth::user();
@@ -34,6 +42,8 @@ class SkpdPermohonanController extends Controller
         $permohonan = new Permohonan();
         // foreign key ke tabel users
         $permohonan->skpd_id        = $user->id;
+        $permohonan->category_id    = $request->category_id; // Menambahkan kategori
+        $permohonan->subcategory_id = $request->subcategory_id;
         $permohonan->nama_subdomain = $request->nama_subdomain;
         $permohonan->status         = 'menunggu';
 
