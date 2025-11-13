@@ -5,6 +5,8 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminSkpdController;
 use App\Http\Controllers\AdminPermohonanController;
 use App\Http\Controllers\AdminSubdomainController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\SkpdPermohonanController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\SkpdDashboardController;
@@ -59,6 +61,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/permohonan/{id}/update', [AdminPermohonanController::class, 'updateStatus'])
         ->name('admin.permohonan.updateStatus');
 
+    // 🔴 DELETE PERMOHONAN — HANYA UNTUK STATUS DITOLAK
+    Route::delete('/admin/permohonan/{id}', [AdminPermohonanController::class, 'destroy'])
+        ->name('admin.permohonan.destroy');
+    
+    Route::get('/admin/permohonan-export', [AdminPermohonanController::class, 'exportExcel'])
+        ->name('admin.permohonan.export');
+
+    Route::get('/admin/permohonan/export/pdf', [AdminPermohonanController::class, 'exportPdf']
+        )->name('admin.permohonan.export.pdf');
+    
+
     // ✅ CRUD Data Subdomain (dengan nama route rapih)
     Route::resource('admin/subdomain', AdminSubdomainController::class)->names([
         'index'   => 'admin.subdomain.index',
@@ -69,6 +82,35 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         'update'  => 'admin.subdomain.update',
         'destroy' => 'admin.subdomain.destroy',
     ]);
+
+    //route kategori
+    Route::resource('admin/categories', CategoryController::class)->names([
+    'index'   => 'admin.categories.index',
+    'create'  => 'admin.categories.create',
+    'store'   => 'admin.categories.store',
+    'show'    => 'admin.categories.show',
+    'edit'    => 'admin.categories.edit',
+    'update'  => 'admin.categories.update',
+    'destroy' => 'admin.categories.destroy',
+    ]);
+
+    //sub kategori
+    // Rute untuk Subkategori
+Route::resource('admin/subcategories', SubcategoryController::class)->names([
+    'index'   => 'admin.subcategories.index',
+    'create'  => 'admin.subcategories.create',
+    'store'   => 'admin.subcategories.store',
+    'show'    => 'admin.subcategories.show',
+    'edit'    => 'admin.subcategories.edit',
+    'update'  => 'admin.subcategories.update',
+    'destroy' => 'admin.subcategories.destroy',
+]);
+
+Route::get('admin/categories/{category}/subcategories', [SubcategoryController::class, 'getSubcategories']);
+Route::get('admin/categories/{categoryId}/subcategories', function ($categoryId) {
+    $subcategories = Subcategory::where('category_id', $categoryId)->get();
+    return response()->json(['subcategories' => $subcategories]);
+});
 });
 
 
@@ -99,5 +141,9 @@ Route::middleware(['auth', 'role:skpd'])->group(function () {
     Route::get('/skpd/permohonansaya', [SkpdPermohonanController::class, 'index'])
         ->name('skpd.permohonansaya.index');
 
-   
+   Route::get('skpd/categories/{category}/subcategories', [SubcategoryController::class, 'getSubcategories']);
+   Route::get('skpd/categories/{categoryId}/subcategories', function ($categoryId) {
+    $subcategories = Subcategory::where('category_id', $categoryId)->get();
+    return response()->json(['subcategories' => $subcategories]);
+});
 });

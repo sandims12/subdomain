@@ -11,14 +11,17 @@ class Permohonan extends Model
 
     protected $table = 'permohonan';
 
-    protected $fillable = [
-        'skpd_id',
-        'nama_subdomain',
-        'file_pengajuan',
-        'status',               // menunggu, disetujui, ditolak
-        'keterangan_admin',     // ⬅️ tambahkan ini
-        'file_tindak_lanjut',   // sudah benar
-    ];
+// Add category_id and subcategory_id to the fillable properties in the model
+protected $fillable = [
+    'skpd_id',
+    'nama_subdomain',
+    'category_id',
+    'subcategory_id',
+    'status',
+    'keterangan_admin',
+    'file_tindak_lanjut',
+];
+
 
     public function skpd()
     {
@@ -29,4 +32,17 @@ class Permohonan extends Model
     {
         return $this->hasOne(Subdomain::class, 'permohonan_id');
     }
+
+    // Menambahkan relasi ke kategori
+public function category()
+{
+    return $this->belongsTo(Category::class);
+}
+
+// Menambahkan relasi ke subkategori
+public function subcategory()
+{
+    return $this->belongsTo(Subcategory::class);
+}
+
 }
