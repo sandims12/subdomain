@@ -16,13 +16,16 @@ class SkpdPermohonanController extends Controller
      */
 public function create()
 {
-    // Ambil semua kategori untuk dropdown
+    // Ambil semua kategori dan subkategori
     $categories = Category::all();
+    $subcategories = Subcategory::all(); // Ambil semua subkategori
 
-    // Ambil semua subkategori untuk dikirim ke JavaScript
-    $subcategories = Subcategory::all();
-
-    return view('skpd.permohonan.create', compact('categories', 'subcategories'));
+    // Kirim data kategori dan subkategori ke view
+    return view('skpd.layouts.wrapper', [
+        'content' => 'skpd.permohonan.create', // Tampilan untuk form permohonan
+        'categories' => $categories,  // Kirim data kategori
+        'subcategories' => $subcategories, // Kirim data subkategori
+    ]);
 }
 
 

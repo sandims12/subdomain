@@ -9,13 +9,10 @@ class Subcategory extends Model
 {
     use HasFactory;
 
-    // Tentukan nama tabel jika tidak sesuai konvensi
-    protected $table = 'subcategories';
-
-    // Tentukan field yang bisa diisi
+    // Kolom yang dapat diisi (fillable)
     protected $fillable = ['category_id', 'name'];
 
-    // Relasi ke model Category
+    // Relasi dengan Category (bisa diakses dengan $subcategory->category)
     public function category()
     {
         return $this->belongsTo(Category::class);
