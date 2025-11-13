@@ -84,5 +84,15 @@
 <link rel="stylesheet" href="{{ asset('vendor/light/css/app-light.css') }}" id="lightTheme">
 <link rel="stylesheet" href="{{ asset('vendor/light/css/app-dark.css') }}" id="darkTheme" disabled>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.5/css/dataTables.dataTables.min.css">
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/2.1.5/js/dataTables.min.js"></script>
+
+
 {{-- Bootstrap Icons --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
