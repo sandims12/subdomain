@@ -11,7 +11,8 @@
 
     <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">Tambah Kategori</a>
 
-    <table class="table mt-4">
+    <!-- Tabel Kategori -->
+    <table id="categoriesTable" class="table table-striped mt-4">
         <thead>
             <tr>
                 <th>#</th>
@@ -36,4 +37,24 @@
             @endforeach
         </tbody>
     </table>
+@endsection
+
+@section('scripts')
+    <!-- Menambahkan DataTables JS dan CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#categoriesTable').DataTable({
+                "order": [[1, 'asc']], // Penyortiran default berdasarkan kolom 1 (Nama Kategori) secara ascending
+                "columnDefs": [
+                    { "orderable": true, "targets": 1 },  // Mengizinkan penyortiran di kolom Nama Kategori
+                    { "orderable": false, "targets": 0 }, // Tidak bisa diurutkan di kolom nomor (#)
+                    { "orderable": false, "targets": 2 }, // Tidak bisa diurutkan di kolom Aksi
+                ]
+            });
+        });
+    </script>
 @endsection

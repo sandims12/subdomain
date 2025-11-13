@@ -6,11 +6,6 @@
             @csrf
 
             <div class="mb-3">
-                <label class="form-label fw-semibold">Nama Subdomain</label>
-                <input type="text" name="nama_subdomain" class="form-control" placeholder="contoh: dispendik.indramayukab.go.id" required>
-            </div>
-
-            <div class="mb-3">
                 <label class="form-label fw-semibold">Kategori</label>
                 <select id="categorySelect" class="form-select" name="category_id" required>
                     <option value="">-- Pilih Kategori --</option>
@@ -22,10 +17,21 @@
 
             <div class="mb-3">
                 <label class="form-label fw-semibold">Subkategori</label>
-                <select id="subcategorySelect" class="form-select" name="subcategory_id" required>
+                <select id="subcategorySelect" class="form-select" name="subcategory_id" required disabled>
                     <option value="">-- Pilih Subkategori --</option>
-                    {{-- Akan diisi oleh JavaScript --}}
                 </select>
+            </div>
+
+            <!-- ✅ FORM jika subkategori punya category_id = 3 -->
+            <div id="subdomainForm" class="mb-3" style="display:none;">
+                <label class="form-label fw-semibold">Nama Subdomain</label>
+                <input type="text" name="subdomain_name" class="form-control" placeholder="contoh: dispendik.indramayukab.go.id">
+            </div>
+
+            <!-- ✅ FORM LAIN jika subkategori selain category_id = 3 -->
+            <div id="formLain" class="mb-3" style="display:none;">
+                <label class="form-label fw-semibold">Keperluan</label>
+                <textarea name="keperluan" class="form-control" rows="3" placeholder="Jelaskan keperluan Anda..."></textarea>
             </div>
 
             <div class="mb-3">
@@ -41,27 +47,57 @@
     </div>
 </main>
 
+
 <script>
-    // Subcategories dari Laravel ke JavaScript
-    const allSubcategories = @json($subcategories);
+    document.addEventListener('DOMContentLoaded', function () {
+        const allSubcategories = @json($subcategories);
+        const categorySelect = document.getElementById('categorySelect');
+        const subcategorySelect = document.getElementById('subcategorySelect');
+        const subdomainForm = document.getElementById('subdomainForm');
+        const formLain = document.getElementById('formLain');
 
-    const categorySelect = document.getElementById('categorySelect');
-    const subcategorySelect = document.getElementById('subcategorySelect');
+        categorySelect.addEventListener('change', function () {
+            const selectedCategoryId = this.value;
 
-    categorySelect.addEventListener('change', function () {
-        const selectedCategoryId = this.value;
+            subcategorySelect.innerHTML = '<option value="">-- Pilih Subkategori --</option>';
+            subcategorySelect.disabled = true;
+            subdomainForm.style.display = 'none';
+            formLain.style.display = 'none';
 
-        // Clear subcategory options
-        subcategorySelect.innerHTML = '<option value="">-- Pilih Subkategori --</option>';
+            if (!selectedCategoryId) return;
 
-        // Filter dan tampilkan
-        allSubcategories
-            .filter(sub => sub.category_id == selectedCategoryId)
-            .forEach(sub => {
+            const filtered = allSubcategories.filter(sub => sub.category_id == selectedCategoryId);
+
+            if (filtered.length > 0) {
+                filtered.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.id;
+                    option.textContent = sub.name;
+                    option.dataset.category = sub.category_id;
+                    subcategorySelect.appendChild(option);
+                });
+
+                subcategorySelect.disabled = false;
+            } else {
                 const option = document.createElement('option');
-                option.value = sub.id;
-                option.textContent = sub.name;
+                option.value = "";
+                option.textContent = "Tidak ada subkategori tersedia";
                 subcategorySelect.appendChild(option);
-            });
+            }
+        });
+
+        subcategorySelect.addEventListener('change', function () {
+            const selectedSubcategoryId = this.value;
+            const selectedSubcategory = allSubcategories.find(sub => sub.id == selectedSubcategoryId);
+
+            subdomainForm.style.display = 'none';
+            formLain.style.display = 'none';
+
+            if (selectedSubcategory && selectedSubcategory.category_id == 3) {
+                subdomainForm.style.display = 'block';
+            } else if (selectedSubcategory) {
+                formLain.style.display = 'block';
+            }
+        });
     });
 </script>
