@@ -51,6 +51,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Route untuk mengedit dan menghapus SKPD
     Route::get('admin/skpd/{id}/edit', [AdminSkpdController::class, 'edit'])->name('admin.skpd.edit');
     Route::put('admin/skpd/{id}', [AdminSkpdController::class, 'update'])->name('admin.skpd.update');
+        Route::get('/admin/permohonan-export', [AdminPermohonanController::class, 'exportExcel'])
+        ->name('admin.permohonan.export');
+
+    Route::get('/admin/permohonan/export/pdf', [AdminPermohonanController::class, 'exportPdf']
+        )->name('admin.permohonan.export.pdf');
     Route::delete('admin/skpd/{id}', [AdminSkpdController::class, 'destroy'])->name('admin.skpd.destroy');
 
     // ✅ Permohonan Subdomain

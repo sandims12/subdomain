@@ -4,21 +4,41 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Permohonan;
-use App\Models\Subdomain;
 use App\Models\Category;
+use App\Models\Subcategory;
+use App\Models\Subdomain;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AdminPermohonanController extends Controller
 {
-    public function index()
-    {
-        $permohonan = Permohonan::with('skpd', 'category', 'subcategory')->latest()->get();
-        return view('admin.permohonan.index', compact('permohonan'));
+public function index(Request $request)
+{
+    // Ambil query builder
+    $query = Permohonan::with('skpd', 'category', 'subcategory', 'subdomain')->latest();
+
+    // Filter berdasarkan kategori jika ada
+    if ($request->filled('kategori')) {
+        $query->where('category_id', $request->kategori);
     }
+
+    // Filter berdasarkan subkategori jika ada
+    if ($request->filled('subkategori')) {
+        $query->where('subcategory_id', $request->subkategori);
+    }
+
+    // Eksekusi query
+    $permohonan = $query->get();
+
+    // Ambil semua kategori & subkategori untuk dropdown filter
+    $allKategori = Category::all();
+    $allSubkategori = Subcategory::all();
+
+    return view('admin.permohonan.index', compact('permohonan', 'allKategori', 'allSubkategori'));
+}
 
     public function show($id)
     {
-        $permohonan = Permohonan::with('skpd', 'category', 'subcategory')->findOrFail($id);
+        $permohonan = Permohonan::with('skpd','category','subcategory')->findOrFail($id);
         return view('admin.permohonan.show', compact('permohonan'));
     }
 
@@ -34,7 +54,7 @@ class AdminPermohonanController extends Controller
         $permohonan->status = $request->status;
         $permohonan->keterangan_admin = $request->keterangan_admin;
 
-        // upload file persetujuan
+        // Upload file tindak lanjut (jika ada)
         if ($request->hasFile('file_tindak_lanjut')) {
             $file = $request->file('file_tindak_lanjut');
             $fileName = time() . '_' . $file->getClientOriginalName();
@@ -44,18 +64,34 @@ class AdminPermohonanController extends Controller
 
         $permohonan->save();
 
-                // kalau disetujui, otomatis buat/aktifkan subdomain di tabel Subdomain
+        /**
+         * ====================================================
+         *  KHUSUS SUBDOMAIN (category=3 && subcategory=6)
+         * ====================================================
+         */
         if ($permohonan->status === 'disetujui') {
-            Subdomain::updateOrCreate(
-                ['permohonan_id' => $permohonan->id],
-                [
-                    'skpd_id'          => $permohonan->skpd_id,                
-                    'nama_subdomain'   => $permohonan->nama_subdomain,
-                    'status'           => 'aktif',
-                    'tanggal_permohonan' => $permohonan->created_at,
-                    'link'             => 'https://' . $permohonan->nama_subdomain,
-                ]
-            );
+
+            // Ambil nama subdomain yang disimpan oleh user
+            $sessionKey = "subdomain_{$permohonan->skpd_id}";
+            $namaSubdomain = session($sessionKey);
+
+            // Jika bukan permohonan subdomain, skip
+            if ($namaSubdomain) {
+
+                Subdomain::updateOrCreate(
+                    ['permohonan_id' => $permohonan->id],
+                    [
+                        'skpd_id' => $permohonan->skpd_id,
+                        'nama_subdomain' => $namaSubdomain,
+                        'status' => 'aktif',
+                        'tanggal_permohonan' => $permohonan->created_at,
+                        'link' => 'https://' . $namaSubdomain,
+                    ]
+                );
+
+                // hapus session biar tidak nyangkut
+                session()->forget($sessionKey);
+            }
         }
 
         Alert::success('Berhasil', 'Status permohonan telah diperbarui.');
