@@ -12,7 +12,7 @@
         <img src="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}" 
              alt="Logo Indramayu" 
              style="width: 100px; height: auto; object-fit: contain; margin-top: 5px;"
-             class="img-fluid shadow-sm mb-2">
+             class="img-fluid mb-2">
         <h5 class="fw-bold text-primary mb-0">SKPD PANEL</h5>
         <small class="text-muted" style="font-size: 13px;">Satuan Kerja Perangkat Daerah</small>
     </div>

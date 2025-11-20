@@ -13,14 +13,11 @@ class Permohonan extends Model
 
 // Add category_id and subcategory_id to the fillable properties in the model
 protected $fillable = [
-    'skpd_id',
-    'nama_subdomain',
-    'category_id',
-    'subcategory_id',
-    'status',
-    'keterangan_admin',
-    'file_tindak_lanjut',
+    'skpd_id', 'category_id', 'subcategory_id',
+    'nama_subdomain', 'lokasi', 'subjek', 'deskripsi',
+    'file_pengajuan', 'status',
 ];
+
 
 
     public function skpd()

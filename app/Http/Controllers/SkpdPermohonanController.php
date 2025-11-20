@@ -6,72 +6,101 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Permohonan;
 use App\Models\Category;
+use App\Models\Subdomain;
 use App\Models\Subcategory;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SkpdPermohonanController extends Controller
 {
-    /**
-     * Form pengajuan permohonan baru
-     */
-public function create()
-{
-    // Ambil semua kategori dan subkategori
-    $categories = Category::all();
-    $subcategories = Subcategory::all(); // Ambil semua subkategori
+    public function create()
+    {
+        $categories = Category::all();
+        $subcategories = Subcategory::all();
 
-    // Kirim data kategori dan subkategori ke view
-    return view('skpd.layouts.wrapper', [
-        'content' => 'skpd.permohonan.create', // Tampilan untuk form permohonan
-        'categories' => $categories,  // Kirim data kategori
-        'subcategories' => $subcategories, // Kirim data subkategori
-    ]);
+        return view('skpd.layouts.wrapper', [
+            'content' => 'skpd.permohonan.create',
+            'categories' => $categories,
+            'subcategories' => $subcategories,
+        ]);
+    }
+
+public function store(Request $request)
+{
+$request->validate([
+    'category_id' => 'required|exists:categories,id',
+    'subcategory_id' => 'required|exists:subcategories,id',
+    'vendor' => 'required|in:iya,tidak',
+    'nama_vendor' => 'nullable|required_if:vendor,iya|max:255',
+    'file_pengajuan' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+]);
+
+
+    $user = Auth::user();
+    $permohonan = new Permohonan();
+    $permohonan->skpd_id = $user->id;
+    $permohonan->category_id = $request->category_id;
+    $permohonan->subcategory_id = $request->subcategory_id;
+
+    // KHUSUS SUBDOMAIN (Kategori = 3 dan Subkategori = 6)
+    if ($request->category_id == 3 && $request->subcategory_id == 6) {
+        $request->validate([
+            'nama_subdomain' => 'required|string|max:100'
+        ]);
+
+        $namaSubdomain = $request->nama_subdomain;
+
+        $permohonan->status = 'disetujui'; // langsung disetujui
+
+    } else {
+        // FORM UMUM – Harus isi subjek, deskripsi, lokasi
+        $request->validate([
+            'subjek' => 'required|string|max:100',
+            'deskiprsi' => 'required|string',
+            'lokasi' => 'required|in:Indoor,Outdoor',
+        ]);
+
+        $permohonan->status = 'menunggu';
+        $permohonan->subjek = $request->subjek;
+        $permohonan->deskiprsi = $request->deskiprsi;
+        $permohonan->lokasi = $request->lokasi;
+    }
+
+    // Upload file pengajuan
+    if ($request->hasFile('file_pengajuan')) {
+        $file = $request->file('file_pengajuan');
+        $namaFile = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/permohonan'), $namaFile);
+        $permohonan->file_pengajuan = $namaFile;
+    }
+
+    $permohonan->vendor = $request->vendor;
+$permohonan->nama_vendor = $request->vendor === 'iya' ? $request->nama_vendor : null;
+
+
+    $permohonan->save();
+
+    // Hanya jika subdomain
+    if ($request->category_id == 3 && $request->subcategory_id == 6) {
+        Subdomain::updateOrCreate(
+            ['permohonan_id' => $permohonan->id],
+            [
+                'skpd_id' => $user->id,
+                'nama_subdomain' => $namaSubdomain,
+                'status' => 'aktif',
+                'kondisi' => 'aktif',
+                'tanggal_permohonan' => now(),
+                'link' => 'https://' . $namaSubdomain,
+            ]
+        );
+    }
+
+    Alert::success('Berhasil', 'Permohonan berhasil dikirim.');
+    return redirect()->route('skpd.dashboard');
 }
 
 
-    /**
-     * Simpan permohonan baru
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
-            'nama_subdomain' => 'required|string|max:255',
-        ]);
 
-        $user = Auth::user();
 
-        $permohonan = new Permohonan();
-        // foreign key ke tabel users
-        $permohonan->skpd_id        = $user->id;
-        $permohonan->category_id    = $request->category_id; // Menambahkan kategori
-        $permohonan->subcategory_id = $request->subcategory_id;
-        $permohonan->nama_subdomain = $request->nama_subdomain;
-        $permohonan->status         = 'menunggu';
-
-        // Upload file pengajuan (jika ada)
-        if ($request->hasFile('file_pengajuan')) {
-            $file     = $request->file('file_pengajuan');
-            $namaFile = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/permohonan'), $namaFile);
-
-            $permohonan->file_pengajuan = $namaFile;
-        }
-
-        $permohonan->save();
-
-        Alert::success(
-            'Berhasil',
-            'Permohonan berhasil diajukan dan menunggu persetujuan admin.'
-        );
-
-        return redirect()->route('skpd.dashboard');
-    }
-
-    /**
-     * Halaman "Permohonan Saya" (riwayat semua permohonan SKPD yg login)
-     */
     public function index()
     {
         $user = Auth::user();
@@ -81,7 +110,7 @@ public function create()
             ->get();
 
         return view('skpd.layouts.wrapper', [
-            'content' => 'skpd.permohonansaya.index', // <-- view yang akan kita buat
+            'content' => 'skpd.permohonansaya.index',
             'riwayat' => $riwayat,
         ]);
     }

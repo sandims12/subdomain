@@ -8,7 +8,30 @@
         </div>
         <div class="card-body">
             <p><strong>Nama SKPD:</strong> {{ $permohonan->skpd->name ?? '-' }}</p>
-            <p><strong>Subdomain:</strong> {{ $permohonan->nama_subdomain }}</p>
+
+            {{-- Informasi Vendor --}}
+<p><strong>Menggunakan Vendor:</strong>
+    @if($permohonan->vendor == 'iya')
+        <span class="text">Iya</span>
+    @else
+        <span class="text">Tidak</span>
+    @endif
+</p>
+
+@if($permohonan->vendor == 'iya')
+    <p><strong>Nama Vendor:</strong> {{ $permohonan->nama_vendor ?? '-' }}</p>
+@endif
+
+
+            {{-- Tampilkan nama subdomain jika kategori = 3 dan subkategori = 6 --}}
+            @if ($permohonan->category_id == 3 && $permohonan->subcategory_id == 6)
+                <p><strong>Nama Subdomain:</strong> {{ optional($permohonan->subdomain)->nama_subdomain ?? '-' }}</p>
+            @else
+                <p><strong>Subjek:</strong> {{ $permohonan->subjek }}</p>
+                <p><strong>Deskripsi:</strong> {!! nl2br(e($permohonan->deskiprsi)) !!}</p>
+                <p><strong>Lokasi:</strong> {{ $permohonan->lokasi }}</p>
+            @endif
+
             <p><strong>Status:</strong>
                 @if ($permohonan->status == 'disetujui')
                     <span class="badge bg-success">Disetujui</span>
@@ -51,7 +74,6 @@
                     @error('status') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
-                {{-- ⬇️ Tambah textarea Keterangan Admin --}}
                 <div class="mb-3">
                     <label for="keterangan_admin" class="form-label fw-bold">Keterangan Admin (opsional)</label>
                     <textarea name="keterangan_admin" id="keterangan_admin" rows="4" class="form-control" maxlength="500" placeholder="Tulis penjelasan singkat...">@if(old('keterangan_admin')){{ old('keterangan_admin') }}@else{{ $permohonan->keterangan_admin }}@endif</textarea>
@@ -64,7 +86,6 @@
                     <input type="file" name="file_tindak_lanjut" class="form-control" accept=".pdf,.doc,.docx">
                     @error('file_tindak_lanjut') <small class="text-danger">{{ $message }}</small> @enderror
 
-                    {{-- jika sudah ada file terdahulu, tampilkan tombol lihat --}}
                     @if ($permohonan->file_tindak_lanjut)
                         <div class="mt-2">
                             <a href="{{ asset('uploads/tindaklanjut/' . $permohonan->file_tindak_lanjut) }}" target="_blank" class="btn btn-sm btn-outline-secondary">

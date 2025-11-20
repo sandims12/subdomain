@@ -2,199 +2,190 @@
 
 @section('content')
 <div class="container-fluid">
-    <h3 class="fw-bold mb-1">Daftar Permohonan Subdomain</h3>
-    <p class="text-muted mb-3" style="font-size: 0.85rem;">
-        Klik judul kolom untuk mengurutkan (↑ naik, ↓ turun).
-    </p>
+  <h3 class="fw-bold mb-1">Daftar Permohonan Subdomain</h3>
 
-    {{-- SEARCH LEFT + EXPORT RIGHT --}}
-    <div class="d-flex justify-content-between align-items-center mb-3">
+  {{-- Aksi Export --}}
+  <div class="d-flex gap-2 mb-3">
+    <a href="{{ route('admin.permohonan.export.pdf') }}" class="btn btn-danger">
+      <i class="bi bi-file-earmark-pdf"></i> Export PDF
+    </a>
+    <a href="{{ route('admin.permohonan.export') }}" class="btn btn-success">
+      <i class="bi bi-file-earmark-excel"></i> Export Excel
+    </a>
+  </div>
 
-        {{-- SEARCH LEFT --}}
-        <!-- <div class="w-25">
-            <input type="text" id="searchInput" class="form-control shadow-sm"
-                   placeholder="🔎 Cari data...">
-        </div> -->
+  {{-- Kartu Tabel + Filter di dalamnya --}}
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body">
 
-        {{-- EXPORT BUTTONS RIGHT --}}
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.permohonan.export.pdf') }}" class="btn btn-danger">
-                <i class="bi bi-file-earmark-pdf"></i> Export PDF
-            </a>
-            <a href="{{ route('admin.permohonan.export') }}" class="btn btn-success">
-                <i class="bi bi-file-earmark-excel"></i> Export Excel
-            </a>
+      {{-- Filter toolbar (di dalam kartu, tepat di atas tabel) --}}
+      <form method="GET" action="{{ route('admin.permohonan.index') }}"
+            class="table-filter-toolbar d-flex flex-wrap align-items-end gap-2 mb-3">
+
+        <div class="filter-field">
+          <label class="filter-label">Kategori</label>
+          <div class="position-relative">
+            <i class="bi bi-grid-1x2 filter-icon"></i>
+            <select name="kategori" id="filter_kategori" class="form-select filter-select">
+              <option value="">Semua</option>
+              @foreach($allKategori as $kategori)
+                <option value="{{ $kategori->id }}" {{ request('kategori') == $kategori->id ? 'selected' : '' }}>
+                  {{ $kategori->name }}
+                </option>
+              @endforeach
+            </select>
+          </div>
         </div>
-    </div>
 
-    {{-- TABLE --}}
-    <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body">
-
-            <table class="table table-hover align-middle mb-0" id="permohonanTable">
-                <thead>
-                <tr>
-                    <th class="sortable" data-column="0" data-type="number"># <span class="sort-icon"></span></th>
-                    <th class="sortable" data-column="1" data-type="text">Nama SKPD <span class="sort-icon"></span></th>
-                    <th class="sortable" data-column="2" data-type="text">Subdomain <span class="sort-icon"></span></th>
-                    <th class="sortable" data-column="3" data-type="text">Status <span class="sort-icon"></span></th>
-                    <th class="sortable" data-column="4" data-type="date">Tanggal <span class="sort-icon"></span></th>
-                    <th class="text-center">Aksi</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                @foreach ($permohonan as $index => $p)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $p->skpd->name ?? '-' }}</td>
-                        <td>{{ $p->nama_subdomain }}</td>
-
-                        <td>
-                            @if ($p->status == 'disetujui')
-                                <span class="badge bg-success px-3 py-2 rounded-pill text-white">Disetujui</span>
-                            @elseif ($p->status == 'menunggu')
-                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill text-white">Menunggu</span>
-                            @else
-                                <span class="badge bg-danger px-3 py-2 rounded-pill text-white">Ditolak</span>
-                            @endif
-                        </td>
-
-                        <td>{{ $p->created_at->format('d M Y') }}</td>
-
-                        <td class="text-center">
-                            {{-- Stack vertikal: Detail di atas, Hapus di bawah --}}
-                            <div class="d-flex flex-column align-items-stretch gap-2 aksi-stack mx-auto">
-                                <a href="{{ route('admin.permohonan.show', $p->id) }}"
-                                   class="btn btn-sm btn-primary rounded-pill w-100">
-                                    <i class="bi bi-eye"></i> Detail
-                                </a>
-
-                                @if ($p->status == 'ditolak')
-                                    <form action="{{ route('admin.permohonan.destroy', $p->id) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Hapus permohonan ini?')"
-                                          class="w-100">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger rounded-pill w-100">
-                                            <i class="bi bi-trash"></i> Hapus
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-
-            </table>
-
+        <div class="filter-field">
+          <label class="filter-label">Subkategori</label>
+          <div class="position-relative">
+            <i class="bi bi-diagram-3 filter-icon"></i>
+            <select name="subkategori" id="filter_subkategori" class="form-select filter-select">
+              <option value="">Semua</option>
+              @foreach($allSubkategori as $subkategori)
+                <option value="{{ $subkategori->id }}" {{ request('subkategori') == $subkategori->id ? 'selected' : '' }}>
+                  {{ $subkategori->name }}
+                </option>
+              @endforeach
+            </select>
+          </div>
         </div>
+
+        <div class="ms-0">
+          <button type="submit" class="btn btn-primary btn-sm px-3">
+            <i class="bi bi-funnel"></i> Terapkan
+          </button>
+          <a href="{{ route('admin.permohonan.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </a>
+        </div>
+
+        {{-- Chips filter aktif --}}
+        @if(request('kategori') || request('subkategori'))
+          <div class="w-100 filter-chips mt-2">
+            @if(request('kategori'))
+              <span class="chip"><i class="bi bi-tag"></i>
+                <span class="chip-label">Kategori:</span>
+                {{ optional($allKategori->firstWhere('id', request('kategori')))->name ?? '—' }}
+              </span>
+            @endif
+            @if(request('subkategori'))
+              <span class="chip"><i class="bi bi-tag"></i>
+                <span class="chip-label">Subkategori:</span>
+                {{ optional($allSubkategori->firstWhere('id', request('subkategori')))->name ?? '—' }}
+              </span>
+            @endif
+          </div>
+        @endif
+      </form>
+
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama SKPD</th>
+              <th>Kategori</th>
+              <th>Subkategori</th>
+              <th>Status</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+          @foreach($permohonan as $index => $item)
+            <tr>
+              <td>{{ $index + 1 }}</td>
+              <td>{{ $item->skpd->name ?? '-' }}</td>
+              <td>{{ $item->category->name ?? '-' }}</td>
+              <td>{{ $item->subcategory->name ?? '-' }}</td>
+              <td>
+                @if ($item->status == 'menunggu')
+                  <span class="badge bg-warning text-dark">Menunggu</span>
+                @elseif ($item->status == 'disetujui')
+                  <span class="badge bg-success">Disetujui</span>
+                @elseif ($item->status == 'ditolak')
+                  <span class="badge bg-danger">Ditolak</span>
+                @endif
+              </td>
+              <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') }}</td>
+              <td>
+                <a href="{{ route('admin.permohonan.show', $item->id) }}" class="btn btn-sm btn-primary">
+                  <i class="bi bi-eye"></i> Detail
+                </a>
+              </td>
+            </tr>
+          @endforeach
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- datatable -->
-
+{{-- DataTables --}}
 <script>
   $(document).ready(function () {
-    $('#permohonanTable').DataTable();
+    $('table').DataTable();
   });
 </script>
 
-
-{{-- ================== SCRIPT ================== --}}
-<script>
-    // 🔎 SEARCH FUNCTION
-    document.getElementById("searchInput").addEventListener("keyup", function () {
-        let value = this.value.toLowerCase();
-        let rows = document.querySelectorAll("#permohonanTable tbody tr");
-
-        rows.forEach(row => {
-            let text = row.innerText.toLowerCase();
-            row.style.display = text.includes(value) ? "" : "none";
-        });
-    });
-
-    // 🔽 SORTING FUNCTION
-    const headers = document.querySelectorAll(".sortable");
-
-    headers.forEach(header => {
-        header.addEventListener("click", function () {
-            const table = document.getElementById("permohonanTable");
-            const tbody = table.querySelector("tbody");
-            const column = parseInt(this.dataset.column);
-            const type = this.dataset.type;
-            let rows = Array.from(tbody.querySelectorAll("tr"));
-
-            const asc = this.dataset.order !== "asc";
-
-            // Reset icon header lain
-            headers.forEach(h => {
-                if (h !== this) {
-                    h.dataset.order = "";
-                    h.querySelector(".sort-icon").textContent = "";
-                }
-            });
-
-            // Set icon baru
-            this.dataset.order = asc ? "asc" : "desc";
-            this.querySelector(".sort-icon").textContent = asc ? "▲" : "▼";
-
-            rows.sort((a, b) => {
-                let x = a.children[column].innerText.trim();
-                let y = b.children[column].innerText.trim();
-
-                if (type === "number") {
-                    x = parseInt(x); y = parseInt(y);
-                } else if (type === "date") {
-                    x = new Date(x); y = new Date(y);
-                } else {
-                    x = x.toLowerCase(); y = y.toLowerCase();
-                }
-
-                return asc ? (x > y ? 1 : -1) : (x < y ? 1 : -1);
-            });
-
-            tbody.innerHTML = "";
-            rows.forEach(row => tbody.appendChild(row));
-        });
-    });
-
-    // 📌 DEFAULT SORT BY DATE DESC
-    window.onload = function () {
-        const thDate = document.querySelector('[data-column="4"]');
-        if (thDate) {
-            thDate.dataset.order = "asc"; // biar klik pertama => DESC
-            thDate.click();
-        }
-    };
-</script>
-
-{{-- UI CLEAN CSS --}}
+{{-- Styling --}}
 <style>
-    thead { background: #f8f9fc; }
+  /* Header tabel */
+  thead { background:#f8f9fc; }
+  thead th{
+    font-size:.8rem;
+    text-transform:uppercase;
+    color:#6c757d;
+    padding-top:14px!important;
+    padding-bottom:14px!important;
+  }
+  tbody tr:hover{ background:rgba(13,110,253,.05); transition:.2s; }
+  .btn-primary{ background:#0d6efd; border:none; }
+  .btn-danger{ background:#dc3545; border:none; }
+  .badge{ font-size:.75rem; }
 
-    thead th {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        color: #6c757d;
-        padding-top: 14px !important;
-        padding-bottom: 14px !important;
-    }
+  /* ==== Filter toolbar ringkas di dalam kartu ==== */
+  .table-filter-toolbar{
+    background: linear-gradient(180deg,#ffffff 0%, #f8faff 100%);
+    border:1px solid #e8eef7;
+    border-radius:14px;
+    padding:12px 14px;
+    box-shadow: 0 6px 18px rgba(13,110,253,.06);
+    max-width: fit-content; /* rapat kiri, tidak melebar */
+  }
+  .filter-label{
+    font-size:.75rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:#6c7a89;
+    margin-bottom:4px!important;
+  }
+  .filter-field{ min-width: 190px; }
+  .filter-icon{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:#6c757d; font-size:1rem; pointer-events:none;
+  }
+  .filter-select{
+    padding-left:38px; height:40px;
+    border-radius:10px; border:1px solid #dfe7f3;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .filter-select:focus{
+    border-color:#86b7fe; box-shadow:0 0 0 .2rem rgba(13,110,253,.12);
+  }
+  .table-filter-toolbar .btn.btn-sm{ border-radius:10px; }
 
-    tbody tr:hover { background: rgba(13,110,253,.05); transition: .2s; }
-
-    .sort-icon { font-size: .75rem; margin-left: 4px; color: #0d6efd; }
-
-    #searchInput { border-radius: 30px; padding-left: 14px; }
-
-    .btn-primary { background: #0d6efd; border: none; }
-    .btn-danger  { background: #dc3545; border: none; }
-
-    .badge { font-size: .75rem; }
-
-    /* Biar tombol aksi rapi & tidak melebar */
-    .aksi-stack { width: 150px; }
+  /* Chips filter aktif */
+  .filter-chips .chip{
+    display:inline-flex; align-items:center; gap:.25rem;
+    background:#eef4ff; border:1px solid #dbe7ff; color:#0b5ed7;
+    border-radius:999px; padding:6px 10px; font-size:.82rem; text-decoration:none;
+  }
+  .chip:hover{ background:#e6f0ff; border-color:#cfe2ff; }
+  .chip-label{ opacity:.75; }
+  .chip i{ font-size:.7rem; opacity:.7; }
 </style>
 @endsection
