@@ -13,8 +13,8 @@
              alt="Logo Indramayu" 
              style="width: 100px; height: auto; object-fit: contain; margin-top: 5px;"
              class="img-fluid mb-2">
-        <h5 class="fw-bold text-primary mb-0">SKPD PANEL</h5>
-        <small class="text-muted" style="font-size: 13px;">Satuan Kerja Perangkat Daerah</small>
+        <h5 class="fw-bold text-primary mb-0">SEGALENGKO</h5>
+        <small class="text-muted" style="font-size: 13px;">Sistem Pengajuan Layanan Elektronik dan Gangguan Kominfo</small>
     </div>
 
     <!-- Navigasi Menu -->

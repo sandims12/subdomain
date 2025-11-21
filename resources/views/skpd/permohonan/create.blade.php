@@ -76,9 +76,11 @@
         <small class="text-muted">Format: pdf/doc/docx (maks 2MB)</small>
     </div>
 
-    <button type="submit" class="btn btn-primary w-100 mt-3">
-        <i class="bi bi-send"></i> Kirim Permohonan
-    </button>
+    <div class="text-start mt-3">
+        <button type="submit" class="btn btn-primary btn-sm px-4">
+            <i class="bi bi-send"></i> Kirim Permohonan
+  </button>
+</div>
 </form>
 
     </div>
@@ -109,7 +111,7 @@
             if (filtered.length > 0) {
                 filtered.forEach(sub => {
                     const option = document.createElement('option');
-                    option.value = sub.id;
+                    option.value = sub.name;
                     option.textContent = sub.name;
                     subcategorySelect.appendChild(option);
                 });
@@ -120,9 +122,9 @@
         // Saat subkategori dipilih
         subcategorySelect.addEventListener('change', function () {
             const selectedCategoryId = parseInt(categorySelect.value);
-            const selectedSubcategoryId = parseInt(this.value);
+            const selectedSubcategoryId = this.value;
 
-            if (selectedCategoryId === 3 && selectedSubcategoryId === 6) {
+            if ((selectedSubcategoryId ?? '').toLowerCase().replace(/\s+/g, '') === 'subdomain') {
                 formSubdomain.style.display = 'block';
                 formLainnya.style.display = 'none';
                 namaSubdomainInput.setAttribute('required', true);
@@ -153,3 +155,9 @@
         });
     });
 </script>
+
+<style>
+  @media (max-width: 576px){
+    .btn.btn-sm { padding: .5rem 1rem; font-size: .9rem; }
+  }
+</style>

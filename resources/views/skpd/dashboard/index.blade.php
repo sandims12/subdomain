@@ -19,7 +19,7 @@
                 Selamat Datang, {{ strtoupper(Auth::user()->name) }}
             </h2>
             <p class="text-light mb-0 fs-6">
-                Dashboard Aplikasi Pengajuan Subdomain SKPD Kabupaten Indramayu   
+                Dashboard Sistem Pengajuan Layanan Elektronik dan Gangguan Kominfo 
             </p>
             <div class="mx-auto mt-3"
                  style="width: 80px; height: 4px; background-color: #ffffff; border-radius: 10px;"></div>

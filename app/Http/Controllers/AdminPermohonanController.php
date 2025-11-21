@@ -48,60 +48,52 @@ class AdminPermohonanController extends Controller
     }
 
     public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status'            => 'required|in:menunggu,disetujui,ditolak',
-            'keterangan_admin'  => 'nullable|string|max:500',
-            'file_tindak_lanjut'=> 'nullable|file|mimes:pdf,doc,docx|max:2048',
-        ]);
+{
+    $request->validate([
+        'status'            => 'required|in:menunggu,disetujui,ditolak',
+        'keterangan_admin'  => 'nullable|string|max:500',
+        'file_tindak_lanjut'=> 'nullable|file|mimes:pdf,doc,docx|max:2048',
+    ]);
 
-        $permohonan                   = Permohonan::findOrFail($id);
-        $permohonan->status           = $request->status;
-        $permohonan->keterangan_admin = $request->keterangan_admin;
+    $permohonan = Permohonan::findOrFail($id);
+    $permohonan->status = $request->status;
+    $permohonan->keterangan_admin = $request->keterangan_admin;
 
-        // Upload file tindak lanjut (jika ada)
-        if ($request->hasFile('file_tindak_lanjut')) {
-            $file     = $request->file('file_tindak_lanjut');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/tindaklanjut'), $fileName);
-            $permohonan->file_tindak_lanjut = $fileName;
-        }
-
-        $permohonan->save();
-
-        /**
-         * ====================================================
-         *  KHUSUS SUBDOMAIN (category=3 && subcategory=6)
-         * ====================================================
-         */
-        if ($permohonan->status === 'disetujui') {
-
-            // Ambil nama subdomain yang disimpan oleh user
-            $sessionKey   = "subdomain_{$permohonan->skpd_id}";
-            $namaSubdomain= session($sessionKey);
-
-            // Jika bukan permohonan subdomain, skip
-            if ($namaSubdomain) {
-
-                Subdomain::updateOrCreate(
-                    ['permohonan_id' => $permohonan->id],
-                    [
-                        'skpd_id'            => $permohonan->skpd_id,
-                        'nama_subdomain'     => $namaSubdomain,
-                        'status'             => 'aktif',
-                        'tanggal_permohonan' => $permohonan->created_at,
-                        'link'               => 'https://' . $namaSubdomain,
-                    ]
-                );
-
-                // hapus session biar tidak nyangkut
-                session()->forget($sessionKey);
-            }
-        }
-
-        Alert::success('Berhasil', 'Status permohonan telah diperbarui.');
-        return redirect()->route('admin.permohonan.index');
+    // Upload file tindak lanjut
+    if ($request->hasFile('file_tindak_lanjut')) {
+        $file = $request->file('file_tindak_lanjut');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/tindaklanjut'), $fileName);
+        $permohonan->file_tindak_lanjut = $fileName;
     }
+
+    $permohonan->save();
+
+    /**
+     * ============================================
+     *  BUAT SUBDOMAIN JIKA DISETUJUI
+     *  (tanpa session — langsung ambil dari permohonan)
+     * ============================================
+     */
+    if ($permohonan->status === 'disetujui' && $permohonan->nama_subdomain) {
+
+        Subdomain::updateOrCreate(
+            ['permohonan_id' => $permohonan->id],
+            [
+                'skpd_id'            => $permohonan->skpd_id,
+                'nama_subdomain'     => $permohonan->nama_subdomain,
+                'status'             => 'aktif',
+                'kondisi'            => 'aktif',
+                'tanggal_permohonan' => $permohonan->created_at,
+                'link'               => 'https://' . $permohonan->nama_subdomain,
+            ]
+        );
+    }
+
+    Alert::success('Berhasil', 'Status permohonan telah diperbarui.');
+    return redirect()->route('admin.permohonan.index');
+}
+
 
     /** =========================
      *  Export Excel & PDF
