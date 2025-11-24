@@ -10,94 +10,98 @@
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
   </head>
   <body>
-    <div class="login-card text-center">
-      <div class="login-header">
-        <img src="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}" alt="Logo Indramayu">
-        <h5>LOGIN SKPD</h5>
-        <h4>Satuan Kerja Perangkat Daerah</h4>
-        <p>Kabupaten Indramayu</p>
+
+    <!-- LANDSCAPE SPLIT (kiri biru, kanan form) -->
+    <div class="auth-landscape">
+
+      <!-- LEFT BLUE PANEL -->
+      <div class="left-panel blue">
+  <div class="brand-wrap">
+    <!-- Logo Reang di atas, lebih besar -->
+    <img src="{{ asset('images/reang.png') }}" alt="Indramayu Reang" class="brand-reang">
+
+    <h2 class="brand-title">APLIKASI PENGAJUAN<br>SUBDOMAIN</h2>
+
+    <!-- Subjudul 2 baris sesuai permintaan -->
+    <p class="brand-sub">
+      Satuan Kerja Perangkat Daerah<br>
+      Kabupaten Indramayu
+    </p>
+  </div>
+
+  <div class="brand-footer">© {{ date('Y') }} Pemerintah Kabupaten Indramayu</div>
+</div>
+
+
+
+      <!-- RIGHT WHITE PANEL (FORM LOGIN – tetap logic/field lama) -->
+      <div class="right-panel">
+        <div class="form-wrapper">
+
+          <div class="login-header text-center">
+            <img src="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}" alt="Logo" class="logo-circle">
+            <h4>LOGIN SKPD</h4>
+          </div>
+
+          {{-- Error captcha --}}
+          @if(session('captcha_error'))
+            <div class="alert alert-danger py-2">{{ session('captcha_error') }}</div>
+          @endif
+          {{-- Error email/password --}}
+          @if(session()->has('loginError'))
+            <div class="alert alert-danger py-2 text-center">{{ session('loginError') }}</div>
+          @endif
+
+          <form action="{{ url('/login') }}" method="POST" id="loginForm">
+            @csrf
+
+            <input type="email" class="form-control" name="email" placeholder="Email" required>
+
+            <div class="password-wrapper">
+              <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+              <i class="fa-solid fa-eye" id="togglePassword"></i>
+            </div>
+
+            <div class="captcha-box" id="captchaText"></div>
+            <button type="button" class="refresh-btn" id="refreshCaptcha">Ganti Kode</button>
+            <input type="text" id="captchaInput" class="form-control mt-2" placeholder="Masukkan kode di atas" required>
+
+            <button class="btn-login" type="submit">Masuk</button>
+            <p class="small-link"><a href="/forgot-password">Lupa Password?</a></p>
+            <p class="small-link mt-3">Belum punya akun? <a href="/register">Daftar</a></p>
+            
+          </form>
+        </div>
       </div>
 
-      {{-- 🔴 Pesan error captcha --}}
-      @if(session('captcha_error'))
-        <div class="alert alert-danger py-2">
-          {{ session('captcha_error') }}
-        </div>
-      @endif
-
-      {{-- 🔴 Pesan error email/password --}}
-      @if(session()->has('loginError'))
-        <div class="alert alert-danger py-2 text-center">
-          {{ session('loginError') }}
-        </div>
-      @endif
-
-      <form action="{{ url('/login') }}" method="POST" id="loginForm">
-        @csrf
-        <div class="form-group mb-3">
-          <input type="email" class="form-control form-control-lg" name="email" placeholder="Masukkan Email" required>
-        </div>
-
-        <div class="form-group mb-3 password-wrapper">
-          <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Masukkan Password" required>
-          <i class="fa-solid fa-eye" id="togglePassword"></i>
-        </div>
-
-        {{-- ✅ CAPTCHA --}}
-        <div class="form-group mb-3">
-          <div class="captcha-box mb-2" id="captchaText"></div>
-          <button type="button" class="refresh-btn" id="refreshCaptcha">🔄 Ganti Kode</button>
-          <input type="text" id="captchaInput" class="form-control mt-2" placeholder="Masukkan kode di atas" required>
-          <small class="text-muted">Masukkan huruf & angka sesuai gambar di atas</small>
-        </div>
-
-        <button class="btn btn-lg btn-primary w-100 mt-2" type="submit">Masuk</button>
-
-        <p class="small-link mt-3 mb-1">Belum punya akun? <a href="/register">Daftar</a></p>
-        <p class="small-link"><a href="/forgot-password">Lupa Password?</a></p>
-      </form>
     </div>
 
     <script>
-      // 🔠 Generate Captcha (Frontend)
+      // Captcha
       function generateCaptcha() {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
         let captcha = '';
-        for (let i = 0; i < 6; i++) {
-          captcha += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
+        for (let i = 0; i < 6; i++) captcha += chars.charAt(Math.floor(Math.random() * chars.length));
         sessionStorage.setItem('captcha_code', captcha);
         document.getElementById('captchaText').textContent = captcha;
       }
-
-      // 🔍 Validasi Captcha
-      document.getElementById('loginForm').addEventListener('submit', function(event) {
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
         const input = document.getElementById('captchaInput').value.trim();
         const code = sessionStorage.getItem('captcha_code');
-        if (input !== code) {
-          event.preventDefault();
-          alert('⚠️ Captcha salah, silakan ulangi.');
-          generateCaptcha();
-        }
+        if (input !== code) { e.preventDefault(); alert('⚠️ Captcha salah, silakan ulangi.'); generateCaptcha(); }
       });
+      document.getElementById('refreshCaptcha').addEventListener('click', generateCaptcha);
 
-      // 🔄 Tombol refresh captcha
-      document.getElementById('refreshCaptcha').addEventListener('click', function() {
-        generateCaptcha();
-      });
-
-      // 👁️ Toggle Password Visibility
+      // Toggle password
       document.getElementById('togglePassword').addEventListener('click', function () {
-        const passwordInput = document.getElementById('password');
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
+        const el = document.getElementById('password');
+        el.type = el.type === 'password' ? 'text' : 'password';
         this.classList.toggle('fa-eye-slash');
       });
 
       window.onload = generateCaptcha;
     </script>
-    {{-- SweetAlert Include --}}
-    @include('sweetalert::alert')
 
+    @include('sweetalert::alert')
   </body>
 </html>

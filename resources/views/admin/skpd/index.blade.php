@@ -16,7 +16,7 @@
             <table id="skpdTable" class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>NO</th>
                         <th>Nama SKPD</th>
                         <th>Email</th>
                         <th>Tanggal Terdaftar</th>
