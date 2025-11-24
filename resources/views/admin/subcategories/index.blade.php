@@ -17,7 +17,7 @@
             <table id="subcategoriesTable" class="table table-hover align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>#</th>
+                    <th>No</th>
                     <th>Nama Subkategori</th>
                     <th>Kategori</th>
                     <th class="text-center">Aksi</th>

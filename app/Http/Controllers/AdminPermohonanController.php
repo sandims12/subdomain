@@ -75,20 +75,17 @@ class AdminPermohonanController extends Controller
      *  (tanpa session — langsung ambil dari permohonan)
      * ============================================
      */
-    if ($permohonan->status === 'disetujui' && $permohonan->nama_subdomain) {
-
-        Subdomain::updateOrCreate(
-            ['permohonan_id' => $permohonan->id],
-            [
-                'skpd_id'            => $permohonan->skpd_id,
-                'nama_subdomain'     => $permohonan->nama_subdomain,
-                'status'             => 'aktif',
-                'kondisi'            => 'aktif',
-                'tanggal_permohonan' => $permohonan->created_at,
-                'link'               => 'https://' . $permohonan->nama_subdomain,
-            ]
-        );
+if ($permohonan->status === 'disetujui' && $permohonan->nama_subdomain) {
+    $subdomain = Subdomain::where('permohonan_id', $permohonan->id)->first();
+    if ($subdomain) {
+        $subdomain->status = 'aktif';
+        $subdomain->kondisi = 'aktif';
+        $subdomain->tanggal_permohonan = $permohonan->created_at;
+        $subdomain->link = 'https://' . $permohonan->nama_subdomain;
+        $subdomain->save();
     }
+}
+
 
     Alert::success('Berhasil', 'Status permohonan telah diperbarui.');
     return redirect()->route('admin.permohonan.index');

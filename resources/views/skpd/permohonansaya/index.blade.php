@@ -4,7 +4,7 @@
     <div class="mb-4">
         <h2 class="fw-bold text-primary mb-1">Permohonan Saya</h2>
         <p class="text-muted">Riwayat seluruh permohonan subdomain yang pernah diajukan oleh SKPD Anda.</p>
-        <div class="mt-2" style="width: 80px; height: 3px; background: linear-gradient(90deg, #0d6efd, #00b894); border-radius: 999px;"></div>
+        <div class="mt-2 gradient-line"></div>
     </div>
 
     {{-- STATISTIK --}}
@@ -18,26 +18,38 @@
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-sm-6">
             <div class="perm-card stat-total">
-                <div class="perm-label">Total Permohonan</div>
-                <div class="perm-value">{{ $total }}</div>
+                <div class="perm-icon"><i class="bi bi-list-ul"></i></div>
+                <div>
+                    <div class="perm-label">Total Permohonan</div>
+                    <div class="perm-value">{{ $total }}</div>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="perm-card stat-waiting">
-                <div class="perm-label">Menunggu</div>
-                <div class="perm-value">{{ $menunggu }}</div>
+                <div class="perm-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div>
+                    <div class="perm-label">Menunggu</div>
+                    <div class="perm-value">{{ $menunggu }}</div>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="perm-card stat-approve">
-                <div class="perm-label">Disetujui</div>
-                <div class="perm-value">{{ $disetujui }}</div>
+                <div class="perm-icon"><i class="bi bi-check-circle"></i></div>
+                <div>
+                    <div class="perm-label">Disetujui</div>
+                    <div class="perm-value">{{ $disetujui }}</div>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="perm-card stat-reject">
-                <div class="perm-label">Ditolak</div>
-                <div class="perm-value">{{ $ditolak }}</div>
+                <div class="perm-icon"><i class="bi bi-x-octagon"></i></div>
+                <div>
+                    <div class="perm-label">Ditolak</div>
+                    <div class="perm-value">{{ $ditolak }}</div>
+                </div>
             </div>
         </div>
     </div>
@@ -61,7 +73,7 @@
                             <th>Subkategori</th>
                             <th class="text-center">Status</th>
                             <th class="text-end">Tanggal</th>
-                            <th class="text-end">Aksi</th> {{-- NEW --}}
+                            <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
 
@@ -73,11 +85,11 @@
                                 <td>{{ $item->subcategory->name ?? '-' }}</td>
                                 <td class="text-center">
                                     @if($item->status == 'menunggu')
-                                        <span class="status-badge status-waiting">Menunggu</span>
+                                        <span class="status-badge status-waiting"><i class="bi bi-hourglass-split me-1"></i>Menunggu</span>
                                     @elseif($item->status == 'disetujui')
-                                        <span class="status-badge status-approve">Disetujui</span>
+                                        <span class="status-badge status-approve"><i class="bi bi-check-circle me-1"></i>Disetujui</span>
                                     @elseif($item->status == 'ditolak')
-                                        <span class="status-badge status-reject">Ditolak</span>
+                                        <span class="status-badge status-reject"><i class="bi bi-x-octagon me-1"></i>Ditolak</span>
                                     @endif
                                 </td>
                                 <td class="text-end text-muted">
@@ -86,9 +98,14 @@
 
                                 {{-- AKSI --}}
                                 <td class="text-end">
+                                    <a href="{{ route('skpd.permohonan.show', $item->id) }}"
+                                       class="btn btn-sm btn-outline-info rounded-pill px-3 me-1">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+
                                     @if($item->status === 'menunggu')
                                         <a href="{{ route('skpd.permohonan.edit', $item->id) }}"
-                                           class="btn btn-sm btn-outline-primary me-1">
+                                           class="btn btn-sm btn-outline-primary rounded-pill px-3 me-1">
                                             <i class="bi bi-pencil"></i> Edit
                                         </a>
                                         <form action="{{ route('skpd.permohonan.destroy', $item->id) }}"
@@ -96,15 +113,15 @@
                                               onsubmit="return confirm('Hapus permohonan ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-sm btn-outline-danger">
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3">
                                                 <i class="bi bi-trash"></i> Hapus
                                             </button>
                                         </form>
                                     @else
-                                        <button class="btn btn-sm btn-outline-secondary me-1" disabled>
+                                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1" disabled>
                                             <i class="bi bi-pencil"></i> Edit
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" disabled>
                                             <i class="bi bi-trash"></i> Hapus
                                         </button>
                                     @endif
@@ -128,19 +145,47 @@
 
 {{-- STYLE --}}
 <style>
-    .perm-card {
-        background:#fff;border-radius:18px;padding:14px 16px;
-        box-shadow:0 4px 10px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.03);
-        transition:all .25s ease
+    .gradient-line {
+        width: 100px; height: 3px;
+        background: linear-gradient(90deg, #0d6efd, #00b894);
+        border-radius: 999px;
     }
-    .perm-card:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,.05) }
-    .perm-label{ font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:#888 }
-    .perm-value{ font-size:24px; font-weight:700 }
-    .stat-total .perm-value{ color:#0d6efd } .stat-waiting .perm-value{ color:#f0ad00 }
-    .stat-approve .perm-value{ color:#28a745 } .stat-reject .perm-value{ color:#dc3545 }
 
-    .status-badge{ font-size:12px; font-weight:600; padding:5px 14px; border-radius:999px; display:inline-block }
-    .status-waiting{ background:#fff4d6; color:#c58a00 }
-    .status-approve{ background:#d8fbe8; color:#15803d }
-    .status-reject{ background:#ffe1e3; color:#c53030 }
+    .perm-card {
+        display: flex; align-items: center; gap: 12px;
+        background: #fff; border-radius: 18px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,.04);
+        border: 1px solid rgba(0,0,0,.03);
+        transition: all .25s ease;
+    }
+    .perm-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
+
+    .perm-icon {
+        font-size: 1.5rem;
+        display: flex; align-items: center; justify-content: center;
+        width: 40px; height: 40px;
+        border-radius: 50%; background: #f1f3f9;
+        color: #0d6efd;
+    }
+
+    .perm-label { font-size: 12px; text-transform: uppercase; color: #6c757d; margin-bottom: 3px; }
+    .perm-value { font-size: 22px; font-weight: 700; color: #222; }
+
+    .stat-total .perm-icon { background: #eaf1ff; color: #0d6efd; }
+    .stat-waiting .perm-icon { background: #fff4d6; color: #c58a00; }
+    .stat-approve .perm-icon { background: #d8fbe8; color: #15803d; }
+    .stat-reject .perm-icon { background: #ffe1e3; color: #c53030; }
+
+    .status-badge {
+        font-size: 12px; font-weight: 600;
+        padding: 6px 14px; border-radius: 999px;
+        display: inline-flex; align-items: center;
+    }
+    .status-waiting { background: #fff4d6; color: #c58a00; }
+    .status-approve { background: #d8fbe8; color: #15803d; }
+    .status-reject { background: #ffe1e3; color: #c53030; }
+
+    .table th { font-size: .85rem; text-transform: uppercase; color: #6c757d; letter-spacing: .5px; }
+    .table td { font-size: .9rem; }
 </style>

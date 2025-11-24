@@ -17,7 +17,7 @@
             <table id="categoriesTable" class="table table-hover align-middle mb-0">
                 <thead>
                 <tr>
-                    <th>#</th>
+                    <th>NO</th>
                     <th>Nama Kategori</th>
                     <th class="text-center">Aksi</th>
                 </tr>

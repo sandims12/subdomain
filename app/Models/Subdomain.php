@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;          // ⬅️ penting, import User
 use App\Models\Permohonan;
 
 class Subdomain extends Model
@@ -15,18 +14,34 @@ class Subdomain extends Model
 
     protected $fillable = [
         'permohonan_id',
-        'skpd_id',              // id user yang role-nya = skpd
+        'skpd_id',               // id user skpd
         'nama_subdomain',
-        'status',               // aktif / nonaktif / error
+
+        // kolom detail aplikasi (opsional, boleh dipakai nanti)
+        'nama_aplikasi',
+        'sifat',                 // Online / Offline
+        'tahun_penganggaran',
+        'layanan',
+        'platform_os',
+        'jenis_aplikasi',
+        'database_engine',
+        'bahasa_pemrograman',
+        'status_aplikasi',       // Aktif / Tidak Aktif
+        'pengelola',
+        'ket_pembangunan',
+        'kendala_pembangunan',
+        'rencana_tindak_lanjut',
+
+        'kondisi',               // aktif / nonaktif / error
+        'status',                // aktif / nonaktif
         'tanggal_permohonan',
         'link',
     ];
 
-    // SKPD sekarang diambil dari tabel users
     public function skpd()
-{
-    return $this->belongsTo(\App\Models\User::class, 'skpd_id');
-}
+    {
+        return $this->belongsTo(\App\Models\User::class, 'skpd_id');
+    }
 
     public function permohonan()
     {

@@ -28,61 +28,80 @@ class SkpdPermohonanController extends Controller
     /** ======================== STORE ======================== */
     public function store(Request $request)
     {
-        // Validasi pakai NAME
         $request->validate([
             'category_id'    => 'required|exists:categories,id',
             'subcategory_id' => 'required|string|exists:subcategories,name',
             'vendor'         => 'required|in:iya,tidak',
             'nama_vendor'    => 'nullable|required_if:vendor,iya|max:255',
             'file_pengajuan' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+
+            'nama_subdomain' => 'nullable|string|max:100',
+            'nama_aplikasi'  => 'nullable|string|max:255',
+            'sifat'          => 'nullable|in:Online,Offline',
+            'tahun_penganggaran' => 'nullable|digits:4',
+            'layanan'         => 'nullable|string',
+            'platform_os'     => 'nullable|string',
+            'jenis_aplikasi'  => 'nullable|string',
+            'database_engine' => 'nullable|string',
+            'bahasa_pemrograman' => 'nullable|string',
+            'pengelola'       => 'nullable|string',
+            'kendala'         => 'nullable|string',
+            'tindak_lanjut'   => 'nullable|string',
+
+            'subjek'          => 'nullable|string',
+            'deskiprsi'       => 'nullable|string',
+            'lokasi'          => 'nullable|in:Indoor,Outdoor',
         ]);
 
-        // Ambil ID subkategori berdasarkan NAME
+        $user = Auth::user();
         $subcategory = Subcategory::where('name', $request->subcategory_id)->first();
 
-        $user         = Auth::user();
-        $permohonan   = new Permohonan();
-        $permohonan->skpd_id        = $user->id;
-        $permohonan->category_id    = $request->category_id;
+        $permohonan = new Permohonan();
+        $permohonan->skpd_id = $user->id;
+        $permohonan->category_id = $request->category_id;
         $permohonan->subcategory_id = $subcategory->id;
+        $permohonan->vendor = $request->vendor;
+        $permohonan->nama_vendor = $request->nama_vendor;
+        $permohonan->status = 'menunggu';
 
-        // Deteksi subdomain berdasarkan NAMA, bukan ID
-        $isSubdomain = strtolower(str_replace(' ', '', $request->subcategory_id)) === 'subdomain';
-
+        $isSubdomain = strtolower(str_replace(' ', '', $subcategory->name)) === 'subdomain';
         if ($isSubdomain) {
-            $request->validate([
-                'nama_subdomain' => 'required|string|max:100'
-            ]);
-
-            $permohonan->nama_subdomain = $request->nama_subdomain; // simpan
-            $permohonan->status         = 'menunggu';
+            $permohonan->nama_subdomain = $request->nama_subdomain;
         } else {
-            // Form umum
-            $request->validate([
-                'subjek'    => 'required|string|max:100',
-                'deskiprsi' => 'required|string',      // <- gunakan kolom sesuai DB
-                'lokasi'    => 'required|in:Indoor,Outdoor',
-            ]);
-
-            $permohonan->status    = 'menunggu';
-            $permohonan->subjek    = $request->subjek;
-            $permohonan->deskiprsi = $request->deskiprsi; // <- jangan diubah namanya
-            $permohonan->lokasi    = $request->lokasi;
+            $permohonan->subjek = $request->subjek;
+            $permohonan->deskiprsi = $request->deskiprsi;
+            $permohonan->lokasi = $request->lokasi;
         }
 
-        // Upload file
         if ($request->hasFile('file_pengajuan')) {
-            @mkdir(public_path('uploads/permohonan'), 0775, true);
-            $file     = $request->file('file_pengajuan');
-            $namaFile = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/permohonan'), $namaFile);
-            $permohonan->file_pengajuan = $namaFile;
+            $file = $request->file('file_pengajuan');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/permohonan'), $fileName);
+            $permohonan->file_pengajuan = $fileName;
         }
-
-        $permohonan->vendor      = $request->vendor;
-        $permohonan->nama_vendor = $request->vendor === 'iya' ? $request->nama_vendor : null;
 
         $permohonan->save();
+
+        if ($isSubdomain) {
+            $subdomain = new Subdomain();
+            $subdomain->skpd_id = $user->id;
+            $subdomain->permohonan_id = $permohonan->id;
+            $subdomain->nama_subdomain = $request->nama_subdomain;
+            $subdomain->nama_aplikasi = $request->nama_aplikasi;
+            $subdomain->sifat = $request->sifat;
+            $subdomain->tahun_penganggaran = $request->tahun_penganggaran;
+            $subdomain->layanan = $request->layanan;
+            $subdomain->platform_os = $request->platform_os;
+            $subdomain->jenis_aplikasi = $request->jenis_aplikasi;
+            $subdomain->database_engine = $request->database_engine;
+            $subdomain->bahasa_pemrograman = $request->bahasa_pemrograman;
+            $subdomain->pengelola = $request->pengelola;
+            $subdomain->kendala_pembangunan = $request->kendala;
+            $subdomain->rencana_tindak_lanjut = $request->tindak_lanjut;
+            $subdomain->status = 'pending';
+            $subdomain->kondisi = 'nonaktif';
+            $subdomain->save();
+        }
 
         Alert::success('Berhasil', 'Permohonan berhasil dikirim.');
         return redirect()->route('skpd.dashboard');
@@ -106,7 +125,6 @@ class SkpdPermohonanController extends Controller
     /** ========================== EDIT ======================= */
     public function edit(Permohonan $permohonan)
     {
-        // hanya pemilik & status menunggu yang bisa edit
         if ($permohonan->skpd_id !== Auth::id()) abort(403);
         if ($permohonan->status !== 'menunggu') {
             Alert::error('Gagal', 'Permohonan yang sudah diproses tidak dapat diedit.');
@@ -124,12 +142,14 @@ class SkpdPermohonanController extends Controller
         ]);
     }
 
-    /** ========================= UPDATE ====================== */
-    public function update(Request $request, Permohonan $permohonan)
+    /** ========================= UPDATE (untuk SKPD) ====================== */
+    public function update(Request $request, $id)
     {
+        $permohonan = Permohonan::findOrFail($id);
+
         if ($permohonan->skpd_id !== Auth::id()) abort(403);
         if ($permohonan->status !== 'menunggu') {
-            Alert::error('Gagal', 'Permohonan yang sudah diproses tidak dapat diedit.');
+            Alert::error('Gagal', 'Permohonan yang sudah diproses tidak dapat diperbarui.');
             return back();
         }
 
@@ -139,60 +159,99 @@ class SkpdPermohonanController extends Controller
             'vendor'         => 'required|in:iya,tidak',
             'nama_vendor'    => 'nullable|required_if:vendor,iya|max:255',
             'file_pengajuan' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'nama_subdomain' => 'nullable|string|max:100',
+            'nama_aplikasi'  => 'nullable|string|max:255',
+            'sifat'          => 'nullable|in:Online,Offline',
+            'tahun_penganggaran' => 'nullable|digits:4',
+            'layanan'         => 'nullable|string',
+            'platform_os'     => 'nullable|string',
+            'jenis_aplikasi'  => 'nullable|string',
+            'database_engine' => 'nullable|string',
+            'bahasa_pemrograman' => 'nullable|string',
+            'pengelola'       => 'nullable|string',
+            'kendala'         => 'nullable|string',
+            'tindak_lanjut'   => 'nullable|string',
+            'subjek'          => 'nullable|string',
+            'deskiprsi'       => 'nullable|string',
+            'lokasi'          => 'nullable|in:Indoor,Outdoor',
         ]);
 
         $subcategory = Subcategory::where('name', $request->subcategory_id)->first();
 
-        $permohonan->category_id    = $request->category_id;
-        $permohonan->subcategory_id = $subcategory->id;
+        $permohonan->update([
+            'category_id' => $request->category_id,
+            'subcategory_id' => $subcategory->id,
+            'vendor' => $request->vendor,
+            'nama_vendor' => $request->nama_vendor,
+        ]);
 
-        $isSubdomain = strtolower(str_replace(' ', '', $request->subcategory_id)) === 'subdomain';
-
+        $isSubdomain = strtolower(str_replace(' ', '', $subcategory->name)) === 'subdomain';
         if ($isSubdomain) {
-            $request->validate([
-                'nama_subdomain' => 'required|string|max:100'
-            ]);
-
             $permohonan->nama_subdomain = $request->nama_subdomain;
-            // kosongkan field umum
-            $permohonan->subjek    = null;
-            $permohonan->deskiprsi = null;  // tetap kolom 'deskiprsi'
-            $permohonan->lokasi    = null;
         } else {
-            $request->validate([
-                'subjek'    => 'required|string|max:100',
-                'deskiprsi' => 'required|string',
-                'lokasi'    => 'required|in:Indoor,Outdoor',
-            ]);
-
-            $permohonan->nama_subdomain = null;
-            $permohonan->subjek    = $request->subjek;
-            $permohonan->deskiprsi = $request->deskiprsi; // tetap pakai 'deskiprsi'
-            $permohonan->lokasi    = $request->lokasi;
+            $permohonan->subjek = $request->subjek;
+            $permohonan->deskiprsi = $request->deskiprsi;
+            $permohonan->lokasi = $request->lokasi;
         }
 
-        // File baru?
         if ($request->hasFile('file_pengajuan')) {
-            @mkdir(public_path('uploads/permohonan'), 0775, true);
-            // hapus file lama jika ada
-            if ($permohonan->file_pengajuan && file_exists(public_path('uploads/permohonan/'.$permohonan->file_pengajuan))) {
-                @unlink(public_path('uploads/permohonan/'.$permohonan->file_pengajuan));
-            }
-            $file     = $request->file('file_pengajuan');
-            $namaFile = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/permohonan'), $namaFile);
-            $permohonan->file_pengajuan = $namaFile;
+            $file = $request->file('file_pengajuan');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/permohonan'), $fileName);
+            $permohonan->file_pengajuan = $fileName;
         }
 
-        $permohonan->vendor      = $request->vendor;
-        $permohonan->nama_vendor = $request->vendor === 'iya' ? $request->nama_vendor : null;
-
-        // tetap menunggu
-        $permohonan->status = 'menunggu';
         $permohonan->save();
 
         Alert::success('Berhasil', 'Permohonan berhasil diperbarui.');
         return redirect()->route('skpd.permohonan.index');
+    }
+    public function show($id)
+    {
+        $permohonan = Permohonan::with(['skpd', 'category', 'subcategory', 'subdomain'])->findOrFail($id);
+        return view('skpd.permohonansaya.show', compact('permohonan'));
+    }
+    
+
+
+    /** ========================= UPDATE STATUS (ADMIN) ====================== */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status'            => 'required|in:menunggu,disetujui,ditolak',
+            'keterangan_admin'  => 'nullable|string|max:500',
+            'file_tindak_lanjut'=> 'nullable|file|mimes:pdf,doc,docx|max:2048',
+        ]);
+
+        $permohonan = Permohonan::findOrFail($id);
+        $permohonan->status = $request->status;
+        $permohonan->keterangan_admin = $request->keterangan_admin;
+
+        if ($request->hasFile('file_tindak_lanjut')) {
+            $file = $request->file('file_tindak_lanjut');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/tindaklanjut'), $fileName);
+            $permohonan->file_tindak_lanjut = $fileName;
+        }
+
+        $permohonan->save();
+
+        if ($permohonan->status === 'disetujui' && $permohonan->nama_subdomain) {
+            Subdomain::updateOrCreate(
+                ['permohonan_id' => $permohonan->id],
+                [
+                    'skpd_id'            => $permohonan->skpd_id,
+                    'nama_subdomain'     => $permohonan->nama_subdomain,
+                    'status'             => 'Aktif',
+                    'kondisi'            => 'aktif',
+                    'tanggal_permohonan' => $permohonan->created_at,
+                    'link'               => 'https://' . $permohonan->nama_subdomain,
+                ]
+            );
+        }
+
+        Alert::success('Berhasil', 'Status permohonan telah diperbarui.');
+        return redirect()->route('admin.permohonan.index');
     }
 
     /** ========================= DESTROY ===================== */

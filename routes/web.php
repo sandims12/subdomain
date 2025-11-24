@@ -97,6 +97,8 @@ Route::middleware(['auth','role:skpd'])
 
     // (opsional) route lama tetap hidup tanpa nama
     Route::get('/permohonan-saya',   [SkpdPermohonanController::class, 'index']);
+    Route::get('/permohonan/{id}', [SkpdPermohonanController::class, 'show'])->name('permohonan.show');
+
 
     // Daftar subdomain milik SKPD yang login
     Route::get('/subdomain', [SkpdSubdomainController::class, 'index'])->name('subdomain.index');
