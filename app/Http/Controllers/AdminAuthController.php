@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AdminAuthController extends Controller
 {
@@ -104,5 +107,78 @@ class AdminAuthController extends Controller
         Alert::success('Berhasil!', 'Nama pengguna berhasil diperbarui.');
 
         return back();
+    }
+
+
+    /* ============================================================
+       ✉️ BAGIAN TAMBAHAN: LUPA PASSWORD + RESET PASSWORD
+       ============================================================ */
+
+    // Halaman form lupa password
+    public function showForgotForm()
+    {
+        return view('admin.auth.forgot-password');
+    }
+
+    // Proses kirim link reset (simulasi lokal)
+    public function sendResetLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            Alert::error('Gagal!', 'Email tidak ditemukan dalam sistem.');
+            return back();
+        }
+
+        $token = Str::random(64);
+
+        DB::table('password_resets')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => $token,
+                'created_at' => now()
+            ]
+        );
+
+        // Simulasi kirim email
+        // Di produksi nanti bisa pakai Mail::send()
+        Alert::success('Berhasil!', 'Tautan reset password telah dikirim ke email (simulasi).');
+        return back();
+    }
+
+    // Halaman form reset password
+    public function showResetForm($token)
+    {
+        return view('admin.auth.reset-password', ['token' => $token]);
+    }
+
+    // Proses reset password
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+            'token' => 'required'
+        ]);
+
+        $check = DB::table('password_resets')
+            ->where(['email' => $request->email, 'token' => $request->token])
+            ->first();
+
+        if (!$check) {
+            Alert::error('Gagal!', 'Token tidak valid atau sudah kadaluarsa.');
+            return back();
+        }
+
+        User::where('email', $request->email)->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        DB::table('password_resets')->where(['email' => $request->email])->delete();
+
+        Alert::success('Berhasil!', 'Password berhasil direset. Silakan login kembali.');
+        return redirect('/login');
     }
 }

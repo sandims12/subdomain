@@ -1,7 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Subdomain | SKPD</title>
+    <title>SEGALENGKO</title>
 
     {{-- Favicon / Touch icons --}}
     <link rel="icon" type="image/png" sizes="32x32"
@@ -136,7 +136,7 @@
         .skpd-main-content {
             opacity: 0;
             margin-top: 8px;                                    /* ganti dari transform */
-            animation: skpdPageEnter 0.4s ease-out 0.05s forwards;
+            animation: skpdPageEnter 0.7s ease-out 0.05s forwards;
         }
 
         .skpd-main-content.skpd-page-leave {

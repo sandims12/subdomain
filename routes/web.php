@@ -26,6 +26,10 @@ Route::get('/register', [AdminAuthController::class, 'nampilnoregister'])->name(
 Route::post('/register',[AdminAuthController::class, 'register']);
 Route::post('/user/update-name', [AdminAuthController::class, 'updateName'])->name('user.updateName');
 Route::get('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+Route::get('/forgot-password', [AdminAuthController::class, 'showForgotForm'])->name('admin.password.request');
+Route::post('/forgot-password', [AdminAuthController::class, 'sendResetLink'])->name('admin.password.email');
+Route::get('/reset-password/{token}', [AdminAuthController::class, 'showResetForm'])->name('admin.password.reset');
+Route::post('/reset-password', [AdminAuthController::class, 'resetPassword'])->name('admin.password.update');
 
 /*
 |--------------------------------------------------------------------------

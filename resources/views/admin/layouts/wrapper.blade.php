@@ -14,8 +14,7 @@
                 data-bs-toggle="dropdown"
                 aria-expanded="false">
 
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=0d6efd&color=fff&size=32"
-                    alt="Avatar" class="rounded-circle me-2">
+                
                 <strong>{{ Auth::user()->name ?? 'Admin' }}</strong>
             </button>
 
