@@ -29,8 +29,11 @@
                 {{-- Nama Subdomain --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nama Subdomain</label>
-                    <input type="text" name="nama_subdomain" id="nama_subdomain" class="form-control" placeholder="Contoh: aplikasi.indramayukab.go.id">
+                    <input type="text" name="nama_subdomain" id="nama_subdomain"
+                        class="form-control"
+                        placeholder="Contoh: Alek">
                 </div>
+
 
                 {{-- Nama Aplikasi --}}
                 <div class="mb-3">
@@ -116,6 +119,12 @@
                     <input type="text" name="pengelola" class="form-control" placeholder="Contoh: BKD, BAPPEDA, Dinas TIK">
                 </div>
 
+                {{-- Keterangan Pembangunan --}}
+                <div class="mb-3">
+                    <label class="form-label">Keterangan Pembangunan</label>
+                    <textarea name="ket_pembangunan" class="form-control" rows="3"placeholder="Tuliskan keterangan pembangunan..."></textarea>
+                </div>
+
                 {{-- Kendala Pengembangan --}}
                 <div class="mb-3">
                     <label class="form-label">Kendala Pengembangan</label>
@@ -193,6 +202,21 @@
         const formSubdomain = document.getElementById('formSubdomain');
         const formLainnya = document.getElementById('formLainnya');
         const namaSubdomainInput = document.getElementById('nama_subdomain');
+
+
+            const domainSuffix = '.indramayukab.go.id';
+
+            if (namaSubdomainInput) {
+                namaSubdomainInput.addEventListener('focus', function () {
+                    let val = this.value.trim();
+                    if (!val) return;
+
+                    // kalau belum ada suffix, tambahkan
+                    if (!val.toLowerCase().endsWith(domainSuffix)) {
+                        this.value = val + domainSuffix;
+                    }
+                });
+            }
 
         // Saat kategori dipilih
         categorySelect.addEventListener('change', function () {

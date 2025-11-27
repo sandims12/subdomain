@@ -3,6 +3,9 @@
 @include('admin.layouts.head')
 
 <body style="background-color: #f8f9fa;">
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
+
 
     {{-- TOPBAR PROFILE --}}
     <div class="admin-topbar d-flex justify-content-end align-items-center">
@@ -49,6 +52,7 @@
 
         </div>
     </div>
+    
 
     <div class="d-flex">
         @include('admin.layouts.sidebar')

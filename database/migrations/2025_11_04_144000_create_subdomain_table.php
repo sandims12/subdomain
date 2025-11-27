@@ -4,41 +4,38 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
+return new class extends Migration {
+    public function up(): void {
         Schema::create('subdomain', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('skpd_id')->constrained('skpd')->onDelete('cascade');
-            $table->foreignId('permohonan_id')->constrained('permohonan')->onDelete('cascade');
-            
+            $table->unsignedBigInteger('skpd_id');
+            $table->unsignedBigInteger('permohonan_id');
             $table->string('nama_subdomain');
-            
-            // kondisi teknis subdomain (aktif/nonaktif/error)
+            $table->string('nama_aplikasi')->nullable();
+            $table->enum('sifat', ['Online', 'Offline'])->nullable();
+            $table->string('tahun_penganggaran', 4)->nullable();
+            $table->string('layanan')->nullable();
+            $table->string('platform_os', 100)->nullable();
+            $table->string('jenis_aplikasi', 100)->nullable();
+            $table->string('database_engine', 100)->nullable();
+            $table->string('bahasa_pemrograman', 100)->nullable();
+            $table->enum('status_aplikasi', ['Aktif', 'Tidak Aktif'])->nullable();
+            $table->string('pengelola')->nullable();
+            $table->text('ket_pembangunan')->nullable();
+            $table->text('kendala_pembangunan')->nullable();
+            $table->text('rencana_tindak_lanjut')->nullable();
             $table->enum('kondisi', ['aktif', 'nonaktif', 'error'])->default('aktif');
-            
-            // status administratif (disetujui/menunggu/ditolak)
-            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-            
-            // tanggal pembuatan subdomain berdasarkan waktu permohonan disetujui
+            $table->enum('status', ['Aktif', 'Tidak Aktif', 'Pending'])->nullable();
             $table->timestamp('tanggal_permohonan')->nullable();
-            
-            // link langsung ke subdomain
             $table->string('link')->nullable();
-            
             $table->timestamps();
+
+            $table->foreign('permohonan_id')->references('id')->on('permohonan')->onDelete('cascade');
+            $table->foreign('skpd_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('subdomain');
     }
 };

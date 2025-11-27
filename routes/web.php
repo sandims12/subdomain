@@ -89,9 +89,16 @@ Route::middleware(['auth','role:skpd'])
     Route::get('/permohonan/create', [SkpdPermohonanController::class, 'create'])->name('permohonan.create');
     Route::post('/permohonan',       [SkpdPermohonanController::class, 'store'])->name('permohonan.store');
     Route::get('/permohonan',        [SkpdPermohonanController::class, 'index'])->name('permohonan.index');
+    Route::get('/permohonan',                [SkpdPermohonanController::class,'index'])->name('permohonan.index');
+    Route::get('/permohonan/{permohonan}/edit', [SkpdPermohonanController::class,'edit'])->name('permohonan.edit');
+    Route::put('/permohonan/{permohonan}',      [SkpdPermohonanController::class,'update'])->name('permohonan.update');
+    Route::delete('/permohonan/{permohonan}',   [SkpdPermohonanController::class,'destroy'])->name('permohonan.destroy');
+
 
     // (opsional) route lama tetap hidup tanpa nama
     Route::get('/permohonan-saya',   [SkpdPermohonanController::class, 'index']);
+    Route::get('/permohonan/{id}', [SkpdPermohonanController::class, 'show'])->name('permohonan.show');
+
 
     // Daftar subdomain milik SKPD yang login
     Route::get('/subdomain', [SkpdSubdomainController::class, 'index'])->name('subdomain.index');
