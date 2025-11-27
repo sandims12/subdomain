@@ -6,7 +6,7 @@
              alt="Logo Admin" 
              class="img-fluid mb-2"
              style="height: 60px;">
-        <h5 class="fw-bold text-primary mt-1 mb-0">ADMIN REANG</h5>
+        <h5 class="fw-bold text-primary mt-1 mb-0">ADMIN REANG SEGALENGKO</h5>
     </div>
 
     {{-- MENU --}}
@@ -60,6 +60,15 @@
             </a>
         </li>
 
+        {{-- 🔹 MENU BARU: TEMPLATE SURAT --}}
+        <li class="mt-2">
+            <a href="/admin/template"
+               class="nav-link sidebar-link {{ request()->is('admin/template*') ? 'active' : '' }}">
+                <i class="bi bi-file-earmark-arrow-up me-2"></i>
+                <span>Template Surat Pengajuan</span>
+            </a>
+        </li>
+
     </ul>
 </div>
 
@@ -70,6 +79,7 @@
         background: #ffffff;
         border-right: 1px solid #e6e6e6;
         position: fixed;
+        z-index: 100;
     }
 
     .sidebar-admin img {

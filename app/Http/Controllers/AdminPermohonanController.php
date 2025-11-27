@@ -49,6 +49,7 @@ class AdminPermohonanController extends Controller
 
     public function updateStatus(Request $request, $id)
 {
+    // var_dump($request->nama_subdomain);die();
     $request->validate([
         'status'            => 'required|in:menunggu,disetujui,ditolak',
         'keterangan_admin'  => 'nullable|string|max:500',
@@ -69,22 +70,23 @@ class AdminPermohonanController extends Controller
 
     $permohonan->save();
 
+
     /**
      * ============================================
      *  BUAT SUBDOMAIN JIKA DISETUJUI
      *  (tanpa session — langsung ambil dari permohonan)
      * ============================================
      */
-if ($permohonan->status === 'disetujui' && $permohonan->nama_subdomain) {
-    $subdomain = Subdomain::where('permohonan_id', $permohonan->id)->first();
-    if ($subdomain) {
-        $subdomain->status = 'aktif';
-        $subdomain->kondisi = 'aktif';
-        $subdomain->tanggal_permohonan = $permohonan->created_at;
-        $subdomain->link = 'https://' . $permohonan->nama_subdomain;
-        $subdomain->save();
+    if ($permohonan->status === 'disetujui') {
+        $subdomain = Subdomain::where('permohonan_id', $permohonan->id)->first();
+        if ($subdomain) {
+            $subdomain->status = 'aktif';
+            $subdomain->kondisi = 'aktif';
+            $subdomain->tanggal_permohonan = $permohonan->created_at;
+            $subdomain->link = 'https://' . $permohonan->nama_subdomain;
+            $subdomain->save();
+        }
     }
-}
 
 
     Alert::success('Berhasil', 'Status permohonan telah diperbarui.');

@@ -14,7 +14,7 @@
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table align-middle table-hover mb-0" id="subdomainTable">
+                <table class="table align-middle table-hover mb-0" id="subdomainTable" style="width: 100%;">
                     <thead class="bg-light text-uppercase small text-secondary">
                         <tr>
                             <th>No</th>
@@ -103,7 +103,7 @@
                                 <td>
                                     @if($s->link)
                                         <a href="{{ $s->link }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
-                                            {{ Str::limit($s->link, 25) }}
+                                            {{ \Illuminate\Support\Str::limit($s->link, 25) }}
                                         </a>
                                     @else
                                         <span class="text-muted">-</span>
@@ -145,17 +145,24 @@
 
 {{-- DataTables --}}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
 <script>
-  $(function(){
+  $(function () {
     $('#subdomainTable').DataTable({
+      responsive: true,                 // ⬅️ bikin tabel ikut responsif
       order: [[1, 'asc']],
       pageLength: 10,
       lengthMenu: [10, 25, 50, 100],
-      columnDefs: [{ orderable:false, targets:[-1] }],
+      columnDefs: [
+        { orderable: false, targets: [-1] }  // kolom aksi tidak bisa di-sort
+      ],
       language: {
         search: "🔍 Cari:",
         lengthMenu: "Tampil _MENU_ data",
@@ -175,7 +182,17 @@
   .table { font-size: .9rem; }
   .badge { font-size: .75rem; letter-spacing: .3px; }
   .dataTables_filter input { border-radius: 20px; padding: 6px 12px; }
+
   .btn-outline-warning:hover { background-color: #ffc107; color: #fff; }
   .btn-outline-danger:hover { background-color: #dc3545; color: #fff; }
+
+  /* Biar scroll horizontal cuma di area tabel, bukan satu halaman */
+  .dataTables_wrapper {
+      width: 100%;
+      overflow-x: auto;
+  }
+  body {
+      overflow-x: hidden;
+  }
 </style>
 @endsection

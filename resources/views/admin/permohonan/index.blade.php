@@ -18,10 +18,11 @@
   <div class="card shadow-sm border-0 rounded-4">
     <div class="card-body">
 
-      {{-- Filter toolbar (di dalam kartu, tepat di atas tabel) --}}
+      {{-- Filter toolbar --}}
       <form method="GET" action="{{ route('admin.permohonan.index') }}"
             class="table-filter-toolbar d-flex flex-wrap align-items-end gap-2 mb-3">
 
+        {{-- Kategori --}}
         <div class="filter-field">
           <label class="filter-label">Kategori</label>
           <div class="position-relative">
@@ -37,6 +38,7 @@
           </div>
         </div>
 
+        {{-- Subkategori (punya data-category) --}}
         <div class="filter-field">
           <label class="filter-label">Subkategori</label>
           <div class="position-relative">
@@ -44,7 +46,9 @@
             <select name="subkategori" id="filter_subkategori" class="form-select filter-select">
               <option value="">Semua</option>
               @foreach($allSubkategori as $subkategori)
-                <option value="{{ $subkategori->id }}" {{ request('subkategori') == $subkategori->id ? 'selected' : '' }}>
+                <option value="{{ $subkategori->id }}"
+                        data-category="{{ $subkategori->category_id }}"
+                        {{ request('subkategori') == $subkategori->id ? 'selected' : '' }}>
                   {{ $subkategori->name }}
                 </option>
               @endforeach
@@ -65,13 +69,15 @@
         @if(request('kategori') || request('subkategori'))
           <div class="w-100 filter-chips mt-2">
             @if(request('kategori'))
-              <span class="chip"><i class="bi bi-tag"></i>
+              <span class="chip">
+                <i class="bi bi-tag"></i>
                 <span class="chip-label">Kategori:</span>
                 {{ optional($allKategori->firstWhere('id', request('kategori')))->name ?? '—' }}
               </span>
             @endif
             @if(request('subkategori'))
-              <span class="chip"><i class="bi bi-tag"></i>
+              <span class="chip">
+                <i class="bi bi-tag"></i>
                 <span class="chip-label">Subkategori:</span>
                 {{ optional($allSubkategori->firstWhere('id', request('subkategori')))->name ?? '—' }}
               </span>
@@ -124,16 +130,66 @@
   </div>
 </div>
 
-{{-- DataTables --}}
+{{-- DataTables + Filter Dependen Kategori/Subkategori --}}
 <script>
   $(document).ready(function () {
+    // Inisialisasi DataTable
     $('table').DataTable();
+
+    // ====== FILTER SUBKATEGORI BERDASARKAN KATEGORI ======
+    const $kategoriSelect    = $('#filter_kategori');
+    const $subkategoriSelect = $('#filter_subkategori');
+
+    // Simpan semua option subkategori (asli)
+    const allSubOptions = $subkategoriSelect.find('option').clone();
+
+    function applySubkategoriFilter() {
+      const selectedKategori = $kategoriSelect.val();
+
+      // kosongkan dulu, lalu isi ulang dari allSubOptions
+      $subkategoriSelect.empty();
+
+      // filter: kalau option tidak punya data-category (artinya "Semua") -> tetap tampil
+      allSubOptions.each(function () {
+        const catId = $(this).data('category');
+
+        if (catId === undefined || catId === null || catId === '') {
+          // option "Semua"
+          $subkategoriSelect.append($(this));
+        } else {
+          // hanya tampilkan yang category_id sama dengan kategori yang dipilih
+          if (!selectedKategori || String(catId) === String(selectedKategori)) {
+            $subkategoriSelect.append($(this));
+          }
+        }
+      });
+
+      // kalau kategori berganti, default subkategori jadi "Semua"
+      if (selectedKategori) {
+        $subkategoriSelect.val('{{ request('subkategori') }}');
+        // kalau request subkategori tidak cocok dengan kategori, akan otomatis ke ""
+        if ($subkategoriSelect.val() === null) {
+          $subkategoriSelect.val('');
+        }
+      } else {
+        $subkategoriSelect.val('{{ request('subkategori') }}');
+      }
+    }
+
+    // Terapkan saat halaman pertama kali load
+    applySubkategoriFilter();
+
+    // Terapkan ulang setiap kali kategori diganti
+    $kategoriSelect.on('change', function () {
+      // hilangkan nilai subkategori sebelumnya saat ganti kategori
+      $subkategoriSelect.val('');
+      applySubkategoriFilter();
+    });
   });
 </script>
 
 {{-- Styling --}}
 <style>
-  /* Header tabel */
   thead { background:#f8f9fc; }
   thead th{
     font-size:.8rem;
@@ -147,14 +203,13 @@
   .btn-danger{ background:#dc3545; border:none; }
   .badge{ font-size:.75rem; }
 
-  /* ==== Filter toolbar ringkas di dalam kartu ==== */
   .table-filter-toolbar{
     background: linear-gradient(180deg,#ffffff 0%, #f8faff 100%);
     border:1px solid #e8eef7;
     border-radius:14px;
     padding:12px 14px;
     box-shadow: 0 6px 18px rgba(13,110,253,.06);
-    max-width: fit-content; /* rapat kiri, tidak melebar */
+    max-width: fit-content;
   }
   .filter-label{
     font-size:.75rem;
@@ -178,7 +233,6 @@
   }
   .table-filter-toolbar .btn.btn-sm{ border-radius:10px; }
 
-  /* Chips filter aktif */
   .filter-chips .chip{
     display:inline-flex; align-items:center; gap:.25rem;
     background:#eef4ff; border:1px solid #dbe7ff; color:#0b5ed7;

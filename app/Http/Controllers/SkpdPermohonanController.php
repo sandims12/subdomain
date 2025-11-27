@@ -45,6 +45,7 @@ class SkpdPermohonanController extends Controller
             'database_engine' => 'nullable|string',
             'bahasa_pemrograman' => 'nullable|string',
             'pengelola'       => 'nullable|string',
+            'ket_pembangunan' => 'nullable|string',
             'kendala'         => 'nullable|string',
             'tindak_lanjut'   => 'nullable|string',
 
@@ -96,6 +97,7 @@ class SkpdPermohonanController extends Controller
             $subdomain->database_engine = $request->database_engine;
             $subdomain->bahasa_pemrograman = $request->bahasa_pemrograman;
             $subdomain->pengelola = $request->pengelola;
+            $subdomain->ket_pembangunan = $request->ket_pembangunan;
             $subdomain->kendala_pembangunan = $request->kendala;
             $subdomain->rencana_tindak_lanjut = $request->tindak_lanjut;
             $subdomain->status = 'pending';
@@ -169,6 +171,7 @@ class SkpdPermohonanController extends Controller
             'database_engine' => 'nullable|string',
             'bahasa_pemrograman' => 'nullable|string',
             'pengelola'       => 'nullable|string',
+            'ket_pembangunan' => 'nullable|string',
             'kendala'         => 'nullable|string',
             'tindak_lanjut'   => 'nullable|string',
             'subjek'          => 'nullable|string',
@@ -217,6 +220,7 @@ class SkpdPermohonanController extends Controller
     /** ========================= UPDATE STATUS (ADMIN) ====================== */
     public function updateStatus(Request $request, $id)
     {
+        
         $request->validate([
             'status'            => 'required|in:menunggu,disetujui,ditolak',
             'keterangan_admin'  => 'nullable|string|max:500',

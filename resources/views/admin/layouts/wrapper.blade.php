@@ -3,6 +3,9 @@
 @include('admin.layouts.head')
 
 <body style="background-color: #f8f9fa;">
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
+
 
     {{-- TOPBAR PROFILE --}}
     <div class="admin-topbar d-flex justify-content-end align-items-center">
@@ -14,7 +17,8 @@
                 data-bs-toggle="dropdown"
                 aria-expanded="false">
 
-                
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=0d6efd&color=fff&size=32"
+                    alt="Avatar" class="rounded-circle me-2">
                 <strong>{{ Auth::user()->name ?? 'Admin' }}</strong>
             </button>
 
@@ -48,6 +52,7 @@
 
         </div>
     </div>
+    
 
     <div class="d-flex">
         @include('admin.layouts.sidebar')

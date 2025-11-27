@@ -25,6 +25,16 @@
                 <i class="bi bi-house-door"></i> Dashboard
             </a>
         </li>
+        <li>
+    <a href="{{ route('skpd.template.index') }}"
+       class="nav-link {{ request()->routeIs('skpd.template.index') ? 'active' : '' }}">
+        <i class="bi bi-file-earmark-text me-2"></i>
+        Template Surat Pengajuan
+    </a>
+</li>
+
+
+
 
         <li>
             <a href="{{ route('skpd.permohonan.create') }}"
