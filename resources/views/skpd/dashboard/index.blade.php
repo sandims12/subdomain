@@ -33,8 +33,10 @@
         </div>
 
         <!-- Statistik -->
-        <div class="row g-4 mb-3 text-center">
-            <div class="col-md-4">
+        <div class="row g-4 mb-3 text-center justify-content-center">
+
+            {{-- Permohonan Dimiliki --}}
+            <div class="col-md-3">
                 <div class="card shadow-sm border-0 rounded-4 stat-card p-4">
                     <div class="card-body">
                         <div class="stat-icon text-primary mb-3">
@@ -46,7 +48,8 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            {{-- Permohonan Disetujui --}}
+            <div class="col-md-3">
                 <div class="card shadow-sm border-0 rounded-4 stat-card p-4">
                     <div class="card-body">
                         <div class="stat-icon text-success mb-3">
@@ -58,7 +61,8 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            {{-- Permohonan Menunggu --}}
+            <div class="col-md-3">
                 <div class="card shadow-sm border-0 rounded-4 stat-card p-4">
                     <div class="card-body">
                         <div class="stat-icon text-warning mb-3">
@@ -69,19 +73,30 @@
                     </div>
                 </div>
             </div>
+
+            {{-- 🆕 Jumlah Subdomain Dimiliki --}}
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 rounded-4 stat-card p-4">
+                    <div class="card-body">
+                        <div class="stat-icon text-info mb-3">
+                            <i class="bi bi-hdd-network fs-1"></i>
+                        </div>
+                        <h6 class="text-secondary mb-1">Subdomain Dimiliki</h6>
+                        <h2 class="fw-bold text-info mb-0">{{ $jumlahSubdomainSaya }}</h2>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- 🌟 CSS KHUSUS DASHBOARD --}}
     <style>
-        /* --- Wrapper --- */
         .skpd-dashboard-wrapper {
             position: relative;
             min-height: 100vh;
             overflow: hidden;
         }
 
-        /* --- Video --- */
         #skpd-bg-video {
             position: fixed;
             top: 0;
@@ -93,7 +108,6 @@
             filter: brightness(0.9);
         }
 
-        /* --- Overlay lembut --- */
         .skpd-bg-overlay {
             position: fixed;
             top: 0;
@@ -106,7 +120,6 @@
             z-index: -1;
         }
 
-        /* --- Konten --- */
         .skpd-dashboard-content {
             position: relative;
             z-index: 1;
@@ -114,7 +127,6 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        /* --- Garis putih di bawah header --- */
         .garis-putih {
             width: 90px;
             height: 4px;
@@ -122,7 +134,6 @@
             border-radius: 10px;
         }
 
-        /* --- Kartu Statistik (Glass Effect) --- */
         .stat-card {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
@@ -136,12 +147,10 @@
             box-shadow: 0 14px 25px rgba(0, 0, 0, 0.2);
         }
 
-        /* --- Icon --- */
         .stat-icon i {
             filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
         }
 
-        /* --- Teks Judul --- */
         .stat-card h6 {
             letter-spacing: 0.03em;
             text-transform: uppercase;
@@ -149,17 +158,9 @@
             font-weight: 600;
         }
 
-        /* --- Responsif --- */
         @media (max-width: 768px) {
-            .skpd-dashboard-content {
-                padding-top: 2rem;
-            }
-            .stat-card {
-                padding: 1.5rem !important;
-            }
-            .stat-icon i {
-                font-size: 1.8rem !important;
-            }
+            .stat-card { padding: 1.5rem !important; }
+            .stat-icon i { font-size: 1.8rem !important; }
         }
     </style>
 
