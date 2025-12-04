@@ -95,101 +95,100 @@
 
         </div>
 
-        {{-- ROW 2: Grafik + Weekly Stats --}}
+        {{-- ROW 2: Ringkasan status + Weekly Stats --}}
         <div class="row g-4">
 
-            {{-- Kiri: Grafik Overview (ala CodePen Pygbbm) --}}
+            {{-- Kiri: Ringkasan Status Permohonan (progress bar) --}}
             <div class="col-lg-8">
                 <div class="dash-card h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h5 class="fw-bold mb-0">Permohonan Overview</h5>
-                            <small class="text-muted">Perbandingan status permohonan</small>
+                            <h5 class="fw-bold mb-0">Ringkasan Status Permohonan</h5>
+                            <small class="text-muted">Distribusi permohonan berdasarkan status</small>
                         </div>
-                        <div class="d-flex align-items-center gap-3 small text-muted">
-                            <span><span class="legend-dot legend-approve"></span> Disetujui</span>
-                            <span><span class="legend-dot legend-pending"></span> Menunggu</span>
-                            <span><span class="legend-dot legend-reject"></span> Ditolak</span>
-                        </div>
+                        <span class="badge bg-light text-muted border rounded-pill small">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            Update {{ now()->translatedFormat('d M Y') }}
+                        </span>
                     </div>
 
-                    {{-- GRAFIK ANIMASI ala Pygbbm --}}
-                    <div class="animated-graph-wrapper">
-                        <svg class="animated-graph-svg" width="529px" height="286px"
-                             viewBox="30 27 529 286" xmlns="http://www.w3.org/2000/svg">
-                            <g id="graph-copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
-                               transform="translate(30, 27)">
-                                {{-- Axis Y --}}
-                                <g id="y_axis" font-size="11" fill="#FFFFFF" opacity="0.4">
-                                    <text><tspan x="25.3" y="264.3">0</tspan></text>
-                                    <text><tspan x="12.8" y="232.7">200</tspan></text>
-                                    <text><tspan x="12.8" y="201">400</tspan></text>
-                                    <text><tspan x="12.8" y="169.3">600</tspan></text>
-                                    <text><tspan x="12.8" y="137.7">800</tspan></text>
-                                    <text><tspan x="6.5" y="106">1000</tspan></text>
-                                    <text><tspan x="6.5" y="74.3">1200</tspan></text>
-                                    <text><tspan x="6.5" y="42.7">1400</tspan></text>
-                                    <text><tspan x="6.5" y="11">1600</tspan></text>
-                                </g>
+                    <div class="status-progress-list">
 
-                                {{-- Garis grafik (3 line = 3 status + 1 untuk Subdomain) --}}
-                                <g id="GRAPHS" transform="translate(64, 16)"
-                                   stroke-linecap="round" stroke-width="8" stroke-linejoin="round">
-                                    {{-- Disetujui (biru) --}}
-                                    <polyline id="Disetujui"
-                                              stroke="#2962FF"
-                                              points="0 1 88.04 1 128.99 137 180.17 137 224.19 182 256.95 91 301.99 137 346.01 91 392.09 91 429.95 179"></polyline>
+                        {{-- Disetujui --}}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1 small">
+                                <span>
+                                    <span class="status-dot bg-success"></span>
+                                    Disetujui
+                                </span>
+                                <span class="fw-semibold">
+                                    {{ $permohonanDisetujui }} ({{ $persenSetuju }}%)
+                                </span>
+                            </div>
+                            <div class="progress soft-progress">
+                                <div class="progress-bar bg-success"
+                                     role="progressbar"
+                                     style="width: {{ $persenSetuju }}%;"
+                                     aria-valuenow="{{ $persenSetuju }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"></div>
+                            </div>
+                        </div>
 
-                                    {{-- Menunggu (kuning) --}}
-                                    <polyline id="Menunggu"
-                                              stroke="#FFB300"
-                                              points="2.05 183 54.26 227 96.23 47 133.08 1 302.02 1 346.68 44.63 386.96 0 427.91 43"></polyline>
+                        {{-- Menunggu --}}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1 small">
+                                <span>
+                                    <span class="status-dot bg-warning"></span>
+                                    Menunggu
+                                </span>
+                                <span class="fw-semibold">
+                                    {{ $permohonanMenunggu }} ({{ $persenMenunggu }}%)
+                                </span>
+                            </div>
+                            <div class="progress soft-progress">
+                                <div class="progress-bar bg-warning"
+                                     role="progressbar"
+                                     style="width: {{ $persenMenunggu }}%;"
+                                     aria-valuenow="{{ $persenMenunggu }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"></div>
+                            </div>
+                        </div>
 
-                                    {{-- Ditolak (merah) --}}
-                                    <polyline id="Ditolak"
-                                              stroke="#E53935"
-                                              points="2.05 180 53.27 180 99.30 91 137.18 47 219.08 47 256.95 90 301.99 47 349.08 137 398.23 137 432 91"></polyline>
+                        {{-- Ditolak --}}
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1 small">
+                                <span>
+                                    <span class="status-dot bg-danger"></span>
+                                    Ditolak
+                                </span>
+                                <span class="fw-semibold">
+                                    {{ $permohonanDitolak }} ({{ $persenTolak }}%)
+                                </span>
+                            </div>
+                            <div class="progress soft-progress">
+                                <div class="progress-bar bg-danger"
+                                     role="progressbar"
+                                     style="width: {{ $persenTolak }}%;"
+                                     aria-valuenow="{{ $persenTolak }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"></div>
+                            </div>
+                        </div>
 
-                                    {{-- Subdomain (biru muda) --}}
-                                    <polyline id="SubDomain"
-                                              stroke="#03A9F4"
-                                              points="2.05 183 52.26 27 23 47 13.08 1 30.02 1 36.68 44.63 386.60 0 427.11 23"></polyline>
-                                </g>
+                        <div class="mt-3 pt-2 border-top small text-muted">
+                            <div class="d-flex justify-content-between">
+                                <span>Total permohonan</span>
+                                <span class="fw-semibold text-dark">{{ $totalPermohonan }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Subdomain aktif</span>
+                                <span class="fw-semibold text-primary">{{ $subdomainAktif }}</span>
+                            </div>
+                        </div>
 
-                                {{-- Axis X --}}
-                                <g id="x_axis" transform="translate(71.97, 271.54)"
-                                   font-size="11" fill="#FFFFFF" opacity="0.4">
-                                    <text><tspan x="0.4" y="11">1</tspan></text>
-                                    <text><tspan x="39.26" y="11">2</tspan></text>
-                                    <text><tspan x="78.88" y="11">3</tspan></text>
-                                    <text><tspan x="118.50" y="11">4</tspan></text>
-                                    <text><tspan x="158.12" y="11">5</tspan></text>
-                                    <text><tspan x="197.73" y="11">6</tspan></text>
-                                    <text><tspan x="237.35" y="11">7</tspan></text>
-                                    <text><tspan x="276.97" y="11">8</tspan></text>
-                                    <text><tspan x="316.59" y="11">9</tspan></text>
-                                    <text><tspan x="359.23" y="11">10</tspan></text>
-                                    <text><tspan x="400.04" y="11">11</tspan></text>
-                                    <text><tspan x="438.47" y="11">12</tspan></text>
-                                </g>
-
-                                {{-- Grid --}}
-                                <g id="grid" transform="translate(46.62, 4.75)"
-                                   stroke="#FFFFFF" stroke-linecap="square" opacity="0.08">
-                                    <path d="M0.4,1.19 L478.99,1.19"></path>
-                                    <path d="M0.4,32.85 L478.99,32.85"></path>
-                                    <path d="M0.4,64.52 L478.99,64.52"></path>
-                                    <path d="M0.4,96.19 L478.99,96.19"></path>
-                                    <path d="M0.4,127.85 L478.99,127.85"></path>
-                                    <path d="M0.4,159.52 L478.99,159.52"></path>
-                                    <path d="M0.4,191.19 L478.99,191.19"></path>
-                                    <path d="M0.4,222.85 L478.99,222.85"></path>
-                                    <path d="M0.4,254.52 L478.99,254.52"></path>
-                                </g>
-                            </g>
-                        </svg>
                     </div>
-                    {{-- END grafik animasi --}}
                 </div>
             </div>
 
@@ -271,7 +270,7 @@
 
     </div>
 
-    {{-- CSS dashboard + grafik --}}
+    {{-- CSS dashboard --}}
     <style>
         body {
             background-color: #f5f7fb;
@@ -331,17 +330,6 @@
         .bg-danger-subtle  { background-color: rgba(211,47,47,0.12); }
         .bg-info-subtle    { background-color: rgba(3,169,244,0.12); }
 
-        .legend-dot {
-            display:inline-block;
-            width:10px;
-            height:10px;
-            border-radius:999px;
-            margin-right:4px;
-        }
-        .legend-approve { background:#2962ff; }
-        .legend-pending { background:#ffb300; }
-        .legend-reject  { background:#e53935; }
-
         .avatar-circle{
             width:40px;
             height:40px;
@@ -361,35 +349,23 @@
             border-top:1px solid #edf1f7;
         }
 
-        /* ====== AREA GRAFIK ANIMASI ala CodePen Pygbbm ====== */
-        .animated-graph-wrapper {
-            height: 260px;
-            border-radius: 18px;
-            overflow: hidden;
-            background: linear-gradient(135deg, #de437d 0%, #5b44b9 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Progress status */
+        .status-dot{
+            display:inline-block;
+            width:10px;
+            height:10px;
+            border-radius:999px;
+            margin-right:6px;
         }
 
-        .animated-graph-svg {
-            width: 100%;
-            max-width: 100%;
-            padding: 20px;
+        .progress.soft-progress{
+            height:9px;
+            background-color:#eef2ff;
+            border-radius:999px;
+            overflow:hidden;
         }
-
-        .animated-graph-svg polyline {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: dash 5s ease-in forwards;
-            animation-iteration-count: infinite;
-            animation-direction: alternate;
-        }
-
-        @keyframes dash {
-            to {
-                stroke-dashoffset: 0;
-            }
+        .progress.soft-progress .progress-bar{
+            border-radius:999px;
         }
     </style>
 @endsection

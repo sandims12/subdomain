@@ -19,6 +19,7 @@ class Subdomain extends Model
 
         // kolom detail aplikasi (opsional, boleh dipakai nanti)
         'nama_aplikasi',
+        'anggaran', 
         'sifat',                 // Online / Offline
         'tahun_penganggaran',
         'layanan',

@@ -12,9 +12,9 @@
         <img src="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}" 
              alt="Logo Indramayu" 
              style="width: 100px; height: auto; object-fit: contain; margin-top: 5px;"
-             class="img-fluid shadow-sm mb-2">
-        <h5 class="fw-bold text-primary mb-0">SKPD PANEL</h5>
-        <small class="text-muted" style="font-size: 13px;">Satuan Kerja Perangkat Daerah</small>
+             class="img-fluid mb-2">
+        <h5 class="fw-bold text-primary mb-0">SEGALENGKO</h5>
+        <small class="text-muted" style="font-size: 13px;">Sistem Pengajuan Layanan Elektronik dan Gangguan Kominfo</small>
     </div>
 
     <!-- Navigasi Menu -->
@@ -25,6 +25,16 @@
                 <i class="bi bi-house-door"></i> Dashboard
             </a>
         </li>
+        <li>
+    <a href="{{ route('skpd.template.index') }}"
+       class="nav-link {{ request()->routeIs('skpd.template.index') ? 'active' : '' }}">
+        <i class="bi bi-file-earmark-text me-2"></i>
+        Template Surat Pengajuan
+    </a>
+</li>
+
+
+
 
         <li>
             <a href="{{ route('skpd.permohonan.create') }}"

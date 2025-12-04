@@ -2,6 +2,16 @@
     <div class="container py-4">
         <h3 class="fw-bold text-primary mb-4">Ajukan Permohonan Subdomain</h3>
 
+        @if ($errors->any())
+    <div class="alert alert-danger small">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
         <form action="{{ route('skpd.permohonan.store') }}" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
             @csrf
 
@@ -24,16 +34,27 @@
                 </select>
             </div>
 
-            {{-- Form jika kategori 3 dan subkategori 6 (Subdomain) --}}
+            {{-- Form Subdomain --}}
             <div id="formSubdomain" style="display: none;">
-                {{-- Nama Subdomain --}}
+
+                {{-- NAMA SUBDOMAIN --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nama Subdomain</label>
-                    <input type="text" name="nama_subdomain" id="nama_subdomain"
-                        class="form-control"
-                        placeholder="Contoh: Alek">
-                </div>
 
+                    <!-- Input Model Gmail -->
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="nama_subdomain_view" 
+                            class="form-control"
+                            placeholder="Contoh: aplikasi"
+                        >
+                        <span class="input-group-text">.indramayukab.go.id</span>
+                    </div>
+
+                    <!-- Hidden: nilai lengkap ke backend -->
+                    <input type="hidden" name="nama_subdomain" id="nama_subdomain">
+                </div>
 
                 {{-- Nama Aplikasi --}}
                 <div class="mb-3">
@@ -41,7 +62,25 @@
                     <input type="text" name="nama_aplikasi" class="form-control" placeholder="Contoh: Aplikasi E-Planning">
                 </div>
 
-                {{-- Sifat Aplikasi --}}
+                <div class="row">
+    {{-- ANGGARAN (BARU) --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Anggaran</label>
+        <select name="anggaran" class="form-select">
+            <option value="">-- Pilih Anggaran --</option>
+            <option value="lebih dari 1 milyar">lebih dari 1 milyar</option>
+            <option value="lebih dari 500 juta < 1 milyar">lebih dari 500 juta &lt; 1 milyar</option>
+            <option value="lebih dari 100 juta < 500 juta">lebih dari 100 juta &lt; 500 juta</option>
+            <option value="kurang dari 100 juta">kurang dari 100 juta</option>
+        </select>
+    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tahun Penganggaran</label>
+                        <input type="number" name="tahun_penganggaran" class="form-control" placeholder="Contoh: 2022">
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Sifat Aplikasi</label>
@@ -52,20 +91,13 @@
                         </select>
                     </div>
 
-                    {{-- Tahun Penganggaran --}}
+
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Tahun Penganggaran</label>
-                        <input type="number" name="tahun_penganggaran" class="form-control" placeholder="Contoh: 2022">
+                        <label class="form-label">Dimanfaatkan Untuk Layanan</label>
+                        <input type="text" name="layanan" class="form-control">
                     </div>
                 </div>
 
-                {{-- Dimanfaatkan Untuk Layanan --}}
-                <div class="mb-3">
-                    <label class="form-label">Dimanfaatkan Untuk Layanan</label>
-                    <input type="text" name="layanan" class="form-control" placeholder="Contoh: E-Planning, E-Budgeting">
-                </div>
-
-                {{-- Platform OS --}}
                 <div class="mb-3">
                     <label class="form-label">Platform OS</label>
                     <select name="platform_os" class="form-select">
@@ -77,7 +109,6 @@
                     </select>
                 </div>
 
-                {{-- Jenis Aplikasi --}}
                 <div class="mb-3">
                     <label class="form-label">Jenis Aplikasi</label>
                     <select name="jenis_aplikasi" class="form-select">
@@ -88,7 +119,6 @@
                     </select>
                 </div>
 
-                {{-- Database Engine --}}
                 <div class="mb-3">
                     <label class="form-label">Database Engine</label>
                     <select name="database_engine" class="form-select">
@@ -100,7 +130,6 @@
                     </select>
                 </div>
 
-                {{-- Bahasa Pemrograman --}}
                 <div class="mb-3">
                     <label class="form-label">Bahasa Pemrograman</label>
                     <select name="bahasa_pemrograman" class="form-select">
@@ -113,76 +142,69 @@
                     </select>
                 </div>
 
-                {{-- Pengelola --}}
                 <div class="mb-3">
                     <label class="form-label">Pengelola</label>
-                    <input type="text" name="pengelola" class="form-control" placeholder="Contoh: BKD, BAPPEDA, Dinas TIK">
+                    <input type="text" name="pengelola" class="form-control">
                 </div>
 
-                {{-- Keterangan Pembangunan --}}
                 <div class="mb-3">
                     <label class="form-label">Keterangan Pembangunan</label>
-                    <textarea name="ket_pembangunan" class="form-control" rows="3"placeholder="Tuliskan keterangan pembangunan..."></textarea>
+                    <textarea name="ket_pembangunan" class="form-control" rows="3"
+                    placeholder="Contoh: Progres pengembangan, pihak yang terlibat, dll."></textarea>
                 </div>
 
-                {{-- Kendala Pengembangan --}}
                 <div class="mb-3">
                     <label class="form-label">Kendala Pengembangan</label>
-                    <textarea name="kendala" class="form-control" rows="3" placeholder="Tuliskan kendala pengembangan..."></textarea>
+                    <textarea name="kendala" class="form-control"></textarea>
                 </div>
 
-                {{-- Rencana Tindak Lanjut --}}
                 <div class="mb-3">
                     <label class="form-label">Rencana Tindak Lanjut</label>
-                    <textarea name="tindak_lanjut" class="form-control" rows="3" placeholder="Tuliskan rencana tindak lanjut..."></textarea>
+                    <textarea name="tindak_lanjut" class="form-control"></textarea>
                 </div>
             </div>
 
-            {{-- Form untuk selain kategori 3 dan subkategori 6 --}}
+            {{-- Form Lainnya --}}
             <div id="formLainnya" style="display: none;">
-                {{-- Subjek --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Subjek</label>
-                    <input type="text" name="subjek" class="form-control" placeholder="Contoh: Layanan Pengaduan">
+                    <input type="text" name="subjek" class="form-control">
                 </div>
 
-                {{-- Deskripsi --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Deskripsi</label>
-                    <textarea name="deskiprsi" class="form-control" rows="4" placeholder="Jelaskan permohonan Anda secara detail..."></textarea>
+                    <textarea name="deskiprsi" class="form-control"></textarea>
                 </div>
 
-                {{-- Lokasi --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Lokasi</label>
                     <select name="lokasi" class="form-select">
-                        <option value="">-- Pilih Lokasi --</option>
+                        <option value="">-- Pilih --</option>
                         <option value="Indoor">Indoor</option>
                         <option value="Outdoor">Outdoor</option>
                     </select>
                 </div>
             </div>
 
-            {{-- Pilihan Vendor --}}
-            <div class="mb-3">
+            {{-- Vendor --}}
+            <div class="mb-3" id="vendor-container">
                 <label for="vendor" class="form-label fw-bold">Apakah menggunakan vendor?</label>
-                <select name="vendor" id="vendor" class="form-select" required>
+                <select name="vendor" id="vendor" class="form-select">
                     <option value="tidak">Tidak</option>
                     <option value="iya">Iya</option>
                 </select>
             </div>
 
-            {{-- Nama Vendor (muncul jika iya) --}}
+            {{-- Nama Vendor --}}
             <div class="mb-3 d-none" id="vendor-nama-container">
                 <label for="nama_vendor" class="form-label fw-bold">Nama Vendor</label>
-                <input type="text" name="nama_vendor" id="nama_vendor" class="form-control" placeholder="Isi nama vendor">
+                <input type="text" name="nama_vendor" id="nama_vendor" class="form-control">
             </div>
 
-            {{-- File Pengajuan --}}
+            {{-- File --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Upload File Pengajuan</label>
                 <input type="file" name="file_pengajuan" class="form-control">
-                <small class="text-muted">Format: pdf/doc/docx (maks 2MB)</small>
             </div>
 
             <div class="text-start mt-3">
@@ -195,84 +217,97 @@
 </main>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const allSubcategories = @json($subcategories);
-        const categorySelect = document.getElementById('categorySelect');
-        const subcategorySelect = document.getElementById('subcategorySelect');
-        const formSubdomain = document.getElementById('formSubdomain');
-        const formLainnya = document.getElementById('formLainnya');
-        const namaSubdomainInput = document.getElementById('nama_subdomain');
+document.addEventListener('DOMContentLoaded', function () {
+    const allSubcategories   = @json($subcategories);
 
+    const categorySelect     = document.getElementById('categorySelect');
+    const subcategorySelect  = document.getElementById('subcategorySelect');
+    const formSubdomain      = document.getElementById('formSubdomain');
+    const formLainnya        = document.getElementById('formLainnya');
 
-            const domainSuffix = '.indramayukab.go.id';
+    const vendorContainer    = document.getElementById('vendor-container');
+    const vendorSelect       = document.getElementById('vendor');
+    const vendorNama         = document.getElementById('vendor-nama-container');
+    const inputNamaVendor    = document.getElementById('nama_vendor');
 
-            if (namaSubdomainInput) {
-                namaSubdomainInput.addEventListener('focus', function () {
-                    let val = this.value.trim();
-                    if (!val) return;
+    const namaView           = document.getElementById('nama_subdomain_view');
+    const namaFull           = document.getElementById('nama_subdomain');
 
-                    // kalau belum ada suffix, tambahkan
-                    if (!val.toLowerCase().endsWith(domainSuffix)) {
-                        this.value = val + domainSuffix;
-                    }
-                });
-            }
+    // --- fungsi bantu ---
+    function resetVendor() {
+        if (vendorContainer) vendorContainer.style.display = 'none';
+        if (vendorNama)      vendorNama.classList.add('d-none');
 
-        // Saat kategori dipilih
+        if (vendorSelect)    vendorSelect.value = 'tidak';
+        if (inputNamaVendor) {
+            inputNamaVendor.value = '';
+            inputNamaVendor.removeAttribute('required');
+        }
+    }
+
+    // sembunyikan vendor di awal
+    resetVendor();
+
+    // ================== INPUT SUBDOMAIN OTOMATIS ==================
+    const domain = ".indramayukab.go.id";
+    if (namaView && namaFull) {
+        namaView.addEventListener('input', function () {
+            let clean = this.value.toLowerCase()
+                .replace(/\s+/g, '')         // hapus spasi
+                .replace(/[^a-z0-9-]/g, ''); // hanya huruf, angka, dash
+
+            this.value     = clean;
+            namaFull.value = clean ? (clean + domain) : '';
+        });
+    }
+
+    // ================== SAAT KATEGORI DIPILIH ==================
+    if (categorySelect) {
         categorySelect.addEventListener('change', function () {
-            const selectedCategoryId = this.value;
+            if (!subcategorySelect) return;
+
             subcategorySelect.innerHTML = '<option value="">-- Pilih Subkategori --</option>';
-            subcategorySelect.disabled = true;
-            formSubdomain.style.display = 'none';
-            formLainnya.style.display = 'none';
-            namaSubdomainInput.removeAttribute('required');
+            subcategorySelect.disabled  = true;
 
-            if (!selectedCategoryId) return;
+            if (formSubdomain) formSubdomain.style.display = 'none';
+            if (formLainnya)   formLainnya.style.display   = 'none';
+            resetVendor();
 
-            const filtered = allSubcategories.filter(sub => sub.category_id == selectedCategoryId);
+            const filtered = allSubcategories.filter(sub => sub.category_id == this.value);
 
-            if (filtered.length > 0) {
-                filtered.forEach(sub => {
-                    const option = document.createElement('option');
-                    option.value = sub.name;
-                    option.textContent = sub.name;
-                    subcategorySelect.appendChild(option);
-                });
-                subcategorySelect.disabled = false;
-            }
+            filtered.forEach(sub => {
+                const opt = document.createElement('option');
+                opt.value = sub.name;
+                opt.textContent = sub.name;
+                subcategorySelect.appendChild(opt);
+            });
+
+            subcategorySelect.disabled = false;
         });
+    }
 
-        // Saat subkategori dipilih
+    // ================== SAAT SUBKATEGORI DIPILIH ==================
+    if (subcategorySelect) {
         subcategorySelect.addEventListener('change', function () {
-            const selectedCategoryId = parseInt(categorySelect.value);
-            const selectedSubcategoryId = this.value;
+            const selected = (this.value || '').toLowerCase().replace(/\s+/g, '');
 
-            if ((selectedSubcategoryId ?? '').toLowerCase().replace(/\s+/g, '') === 'subdomain') {
-                formSubdomain.style.display = 'block';
-                formLainnya.style.display = 'none';
-                namaSubdomainInput.setAttribute('required', true);
-                document.querySelector('[name="sifat"]').setAttribute('required', true);
-                document.querySelector('[name="platform_os"]').setAttribute('required', true);
+            if (selected === 'subdomain') {
+                if (formSubdomain) formSubdomain.style.display = 'block';
+                if (formLainnya)   formLainnya.style.display   = 'none';
+                if (vendorContainer) vendorContainer.style.display = 'block';
             } else {
-                formSubdomain.style.display = 'none';
-                formLainnya.style.display = 'block';
-                namaSubdomainInput.removeAttribute('required');
-
-                // Hapus required saat form disembunyikan
-                document.querySelector('[name="sifat"]').removeAttribute('required');
-                document.querySelector('[name="platform_os"]').removeAttribute('required');
+                if (formSubdomain) formSubdomain.style.display = 'none';
+                if (formLainnya)   formLainnya.style.display   = 'block';
+                resetVendor();
             }
         });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Vendor toggle
-        const vendorSelect = document.getElementById('vendor');
-        const vendorNama = document.getElementById('vendor-nama-container');
-        const inputNamaVendor = document.getElementById('nama_vendor');
+    }
 
+    // ================== VENDOR TOGGLE ==================
+    if (vendorSelect) {
         vendorSelect.addEventListener('change', function () {
+            if (!vendorNama || !inputNamaVendor) return;
+
             if (this.value === 'iya') {
                 vendorNama.classList.remove('d-none');
                 inputNamaVendor.setAttribute('required', true);
@@ -282,5 +317,9 @@
                 inputNamaVendor.value = '';
             }
         });
-    });
+    }
+});
 </script>
+
+
+

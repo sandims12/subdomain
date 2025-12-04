@@ -33,7 +33,7 @@
         <h5 class="fw-bold text-dark mb-0">{{ Auth::user()->name }}</h5>
         <p class="text-muted small mb-1">{{ Auth::user()->email }}</p>
 
-        <span class="badge px-3 py-2"
+        <span class="badge px-3 spy-2"
               style="background:#e8f0ff; color:#0d6efd; border-radius:10px; font-weight:600;">
             {{ Auth::user()->role ?? 'admin' }}
         </span>

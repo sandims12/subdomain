@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Login | SKPD Kabupaten Indramayu</title>
+    <title>Login | SEGALENGKO</title>
 
     <link rel="stylesheet" href="{{ asset('vendor/light/css/app-light.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -20,12 +20,11 @@
     <!-- Logo Reang di atas, lebih besar -->
     <img src="{{ asset('images/reang.png') }}" alt="Indramayu Reang" class="brand-reang">
 
-    <h2 class="brand-title">APLIKASI PENGAJUAN<br>SUBDOMAIN</h2>
+    <h2 class="brand-title">SEGALENGKO</h2>
 
     <!-- Subjudul 2 baris sesuai permintaan -->
     <p class="brand-sub">
-      Satuan Kerja Perangkat Daerah<br>
-      Kabupaten Indramayu
+    Sistem Pengajuan Layanan Elektronik <br>dan Gangguan Kominfo<br>
     </p>
   </div>
 
@@ -40,7 +39,7 @@
 
           <div class="login-header text-center">
             <img src="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}" alt="Logo" class="logo-circle">
-            <h4>LOGIN SKPD</h4>
+            <h4>LOGIN SEGALENGKO</h4>
           </div>
 
           {{-- Error captcha --}}

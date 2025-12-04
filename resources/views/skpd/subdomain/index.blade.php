@@ -48,7 +48,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 60px;">NO</th>
+                            <th style="width: 60px;">No</th>
                             <th>Nama Subdomain</th>
                             <th style="width: 150px;">Kondisi</th>
                             <th style="width: 180px;">Tanggal Dibuat</th>

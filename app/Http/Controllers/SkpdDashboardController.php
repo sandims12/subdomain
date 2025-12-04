@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Permohonan;
+use App\Models\Subdomain; // 🧩 Tambah import model
 use Illuminate\Support\Facades\Auth;
 
 class SkpdDashboardController extends Controller
@@ -27,12 +28,16 @@ class SkpdDashboardController extends Controller
         // Hitung permohonan yang masih menunggu
         $permohonanMenunggu = $permohonan->where('status', 'menunggu')->count();
 
+        // 🆕 Hitung jumlah subdomain milik SKPD dari tabel subdomain
+        $jumlahSubdomainSaya = Subdomain::where('skpd_id', $user->id)->count();
+
         // Kirim semua data ke tampilan dashboard
         return view('skpd.layouts.wrapper', [
             'content' => 'skpd.dashboard.index',
             'totalSubdomain' => $totalSubdomain,
             'subdomainAktif' => $subdomainAktif,
             'permohonanMenunggu' => $permohonanMenunggu,
+            'jumlahSubdomainSaya' => $jumlahSubdomainSaya, // ✅ kirim ke view
             'riwayat' => $permohonan,
             'user' => $user,
         ]);

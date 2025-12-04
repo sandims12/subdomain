@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register | SKPD Kabupaten Indramayu</title>
+    <title>Register | SEGALENGKO</title>
 
     <link rel="stylesheet" href="{{ asset('vendor/light/css/app-light.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,8 +16,9 @@
       <div class="left-panel blue">
         <div class="brand-wrap">
           <img src="{{ asset('images/reang.png') }}" alt="Indramayu Reang" class="brand-reang">
-          <h2 class="brand-title">APLIKASI PENGAJUAN<br>SUBDOMAIN</h2>
-          <p class="brand-sub">Satuan Kerja Perangkat Daerah<br>Kabupaten Indramayu</p>
+          <h2 class="brand-title">SEGALENGKO</h2>
+          <p class="brand-sub">Sistem Pengajuan Layanan Elektronik
+          dan Gangguan Kominfo</p>
         </div>
         <div class="brand-footer">© {{ date('Y') }} Pemerintah Kabupaten Indramayu</div>
       </div>
@@ -27,8 +28,8 @@
         <div class="form-wrapper">
           <div class="reg-header text-center">
             <img src="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}" alt="Logo" class="logo-circle">
-            <h4>Daftar SKPD</h4>
-            <p class="muted">Kabupaten Indramayu</p>
+            <h4>Daftar</h4>
+            <p class="muted">SEGALENGKO</p>
           </div>
 
           <form action="{{ route('register') }}" method="post" novalidate>

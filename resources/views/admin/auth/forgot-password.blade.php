@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <title>Lupa Password | SKPD Indramayu</title>
+  <title>Lupa Password | Admin Indramayu</title>
   <link rel="stylesheet" href="{{ asset('vendor/light/css/app-light.css') }}">
   <style>
     body {
@@ -10,9 +10,9 @@
       font-family: 'Poppins', sans-serif;
     }
     .card {
-      background: white;
+      background: #fff;
       border-radius: 15px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
       padding: 2.5rem;
     }
   </style>
@@ -24,13 +24,12 @@
       <h4 class="text-primary fw-bold">Reset Password</h4>
       <p class="text-muted small mb-4">Masukkan email Anda untuk menerima tautan reset password</p>
 
-      <form method="POST" action="{{ route('password.email') }}">
+      <form method="POST" action="{{ route('admin.password.email') }}">
         @csrf
         <div class="form-group mb-3">
-          <input type="email" name="email" class="form-control" placeholder="Masukkan Email">
+          <input type="email" name="email" class="form-control" placeholder="Masukkan Email" required>
         </div>
-        <button type="submit" class="btn btn-primary w-100">Kirim Tautan</button>
-        <p class="mt-3"><a href="/login" class="text-primary small">Kembali ke Login</a></p>
+        
       </form>
     </div>
   </div>

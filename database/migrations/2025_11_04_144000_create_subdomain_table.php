@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('permohonan_id');
             $table->string('nama_subdomain');
             $table->string('nama_aplikasi')->nullable();
+            $table->string('anggaran', 100)->nullable();
             $table->enum('sifat', ['Online', 'Offline'])->nullable();
             $table->string('tahun_penganggaran', 4)->nullable();
             $table->string('layanan')->nullable();
