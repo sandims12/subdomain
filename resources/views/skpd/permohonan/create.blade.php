@@ -37,7 +37,7 @@
                             type="text" 
                             id="nama_subdomain_view" 
                             class="form-control"
-                            placeholder="Contoh: aplikasi"
+                            placeholder="Contoh: diskominfo"
                         >
                         <span class="input-group-text">.indramayukab.go.id</span>
                     </div>

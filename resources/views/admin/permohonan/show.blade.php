@@ -253,43 +253,69 @@
         </div>
     @endif
 
-    {{-- Status & File (dipertahankan, tapi dibungkus lebih rapi) --}}
-    <div class="mb-4">
-        <h6 class="fw-bold text-primary mb-2">
-            <i class="bi bi-folder-check me-1"></i> Status & Dokumen
-        </h6>
-        <div class="ps-2 py-2 bg-white p-4 border rounded-3">
-            <dl class="row mb-0">
-                <dt class="col-sm-3 text-muted small">Status Permohonan</dt>
-                <dd class="col-sm-9">
-                    @if ($permohonan->status == 'disetujui')
-                        <span class="badge bg-success px-3 py-2 rounded-pill">
-                            <i class="bi bi-check-circle me-1"></i> Disetujui
-                        </span>
-                    @elseif ($permohonan->status == 'menunggu')
-                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
-                            <i class="bi bi-hourglass-split me-1"></i> Menunggu
-                        </span>
-                    @else
-                        <span class="badge bg-danger px-3 py-2 rounded-pill">
-                            <i class="bi bi-x-circle me-1"></i> Ditolak
-                        </span>
-                    @endif
-                </dd>
+    {{-- Status & File (dipertahankan, tapi dibungkus lebih rapi + preview PDF) --}}
+<div class="mb-4">
+    <h6 class="fw-bold text-primary mb-2">
+        <i class="bi bi-folder-check me-1"></i> Status & Dokumen
+    </h6>
 
-                @if($permohonan->file_pengajuan)
-                    <dt class="col-sm-3 text-muted small">File Pengajuan</dt>
-                    <dd class="col-sm-9">
-                        <a href="{{ asset('uploads/permohonan/' . $permohonan->file_pengajuan) }}" 
-                           target="_blank"
-                           class="btn btn-sm btn-outline-primary rounded-pill">
-                            <i class="bi bi-file-earmark-pdf me-1"></i> Lihat File Pengajuan
-                        </a>
-                    </dd>
+    <div class="ps-2 py-2 bg-white p-4 border rounded-3">
+
+        {{-- STATUS PERMOHONAN --}}
+        <dl class="row mb-3">
+            <dt class="col-sm-3 text-muted small">Status Permohonan</dt>
+            <dd class="col-sm-9">
+                @if ($permohonan->status == 'disetujui')
+                    <span class="badge bg-success px-3 py-2 rounded-pill">
+                        <i class="bi bi-check-circle me-1"></i> Disetujui
+                    </span>
+                @elseif ($permohonan->status == 'menunggu')
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                        <i class="bi bi-hourglass-split me-1"></i> Menunggu
+                    </span>
+                @else
+                    <span class="badge bg-danger px-3 py-2 rounded-pill">
+                        <i class="bi bi-x-circle me-1"></i> Ditolak
+                    </span>
                 @endif
-            </dl>
-        </div>
+            </dd>
+        </dl>
+
+        {{-- FILE PENGAJUAN --}}
+@if($permohonan->file_pengajuan)
+    <div class="row mb-3">
+        <dt class="col-sm-3 text-muted small">File Pengajuan</dt>
+        <dd class="col-sm-9"></dd> {{-- Kosong untuk menjaga struktur --}}
     </div>
+
+    @php
+        $file  = $permohonan->file_pengajuan;
+        $ext   = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $url   = asset('uploads/permohonan/' . $file);
+    @endphp
+
+    {{-- PREVIEW FULL WIDTH --}}
+    <div class="border rounded shadow-sm p-2 mb-3" style="background: #fff;">
+        @if($ext === 'pdf')
+            <iframe 
+                src="{{ $url }}"
+                width="100%"
+                height="600px"
+                style="border: none; border-radius: 6px;">
+            </iframe>
+        @else
+            <a href="{{ $url }}" 
+               target="_blank"
+               class="btn btn-sm btn-outline-primary rounded-pill">
+                <i class="bi bi-file-earmark-arrow-down me-1"></i> Download File
+            </a>
+        @endif
+    </div>
+@else
+    <div class="text-muted small">Tidak ada file pengajuan.</div>
+@endif
+
+
 
     {{-- Form Update --}}
     <div class="border-top pt-4">
@@ -364,5 +390,16 @@
     .badge { font-size: .75rem; }
     .form-label { font-size: .9rem; }
     .card-body p { margin-bottom: .4rem; }
+
+    iframe {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
 </style>
 @endsection
