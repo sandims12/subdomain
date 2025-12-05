@@ -2,16 +2,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEGALENGKO</title>
-
-    {{-- Favicon / Touch icons --}}
-    <link rel="icon" type="image/png" sizes="32x32"
-        href="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16"
-        href="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}">
-    <link rel="apple-touch-icon"
-        href="{{ asset('images/Lambang_Kabupaten_Indramayu.png') }}">
-    <meta name="theme-color" content="#0d6efd">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
@@ -136,7 +126,7 @@
         .skpd-main-content {
             opacity: 0;
             margin-top: 8px;                                    /* ganti dari transform */
-            animation: skpdPageEnter 0.7s ease-out 0.05s forwards;
+            animation: skpdPageEnter 0.4s ease-out 0.05s forwards;
         }
 
         .skpd-main-content.skpd-page-leave {

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Subdomain;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SubdomainExport;
+
 
 class AdminSubdomainController extends Controller
 {
@@ -15,6 +18,12 @@ class AdminSubdomainController extends Controller
 
         return view('admin.subdomain.index', compact('subdomain'));
     }
+
+    public function exportExcel()
+{
+    return Excel::download(new SubdomainExport, 'data-subdomain.xlsx');
+}
+
 
     // Menampilkan form untuk membuat subdomain baru
     public function create()

@@ -63,9 +63,11 @@ Route::middleware(['auth', 'role:admin'])
     // Export
     Route::get('/permohonan-export', [AdminPermohonanController::class, 'exportExcel'])->name('permohonan.export');
     Route::get('/permohonan/export/pdf', [AdminPermohonanController::class, 'exportPdf'])->name('permohonan.export.pdf');
+    Route::get('/subdomain/export/excel', [AdminSubdomainController::class, 'exportExcel'])->name('subdomain.export.excel');
 
     // Subdomain (resource)
     Route::resource('subdomain', AdminSubdomainController::class);
+
 
     // Categories (resource)
     Route::resource('categories', CategoryController::class);
