@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('nama_file');
             $table->string('path');
+            $table->string('jenis')->default('subdomain');
             $table->timestamps();
         });
     }

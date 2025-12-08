@@ -274,16 +274,29 @@
                        value="{{ old('nama_vendor', $permohonan->nama_vendor) }}">
             </div>
 
-            {{-- File --}}
+            {{-- File (Hanya PDF) --}}
             <div class="mb-3">
-                <label class="form-label fw-semibold">Upload File Pengajuan</label>
-                <input type="file" name="file_pengajuan" class="form-control">
+                <label class="form-label fw-semibold">Upload File Pengajuan (PDF saja)</label>
+
+                <input 
+                    type="file" 
+                    name="file_pengajuan" 
+                    id="file_pengajuan_edit"
+                    class="form-control"
+                    accept="application/pdf"
+                >
+
+                <small class="text-danger d-none" id="fileErrorEdit">
+                    ❌ Format tidak valid! Hanya file PDF yang diperbolehkan.
+                </small>
+
                 @if($permohonan->file_pengajuan)
-                    <small class="text-muted">
+                    <small class="text-muted d-block mt-1">
                         File saat ini: {{ $permohonan->file_pengajuan }}
                     </small>
                 @endif
             </div>
+
 
             <div class="text-start mt-3">
                 <button type="submit" class="btn btn-primary btn-sm px-4">
@@ -443,4 +456,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+// VALIDASI FILE EDIT — Hanya PDF
+const fileEdit = document.getElementById('file_pengajuan_edit');
+const fileErrEdit = document.getElementById('fileErrorEdit');
+
+if (fileEdit) {
+    fileEdit.addEventListener('change', function () {
+        const file = this.files[0];
+
+        if (file && file.type !== "application/pdf") {
+            fileErrEdit.classList.remove('d-none');
+            this.value = ""; // Reset jika salah format
+        } else {
+            fileErrEdit.classList.add('d-none');
+        }
+    });
+}
+
 </script>

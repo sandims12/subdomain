@@ -137,9 +137,10 @@
         color: #0b5ed7;
     }
 
-    .skpd-sidebar .nav-link.active {
-        background: #0d6efd;
-        color: #ffffff !important;
-        box-shadow: 0 8px 18px rgba(13, 110, 253, 0.5);
-    }
+.skpd-sidebar .nav-link.active {
+    background: linear-gradient(135deg, #00b894, #0d6efd); /* hijau -> biru */
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(13, 110, 253, 0.45);
+}
+
 </style>

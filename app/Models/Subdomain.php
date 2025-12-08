@@ -27,6 +27,7 @@ class Subdomain extends Model
         'jenis_aplikasi',
         'database_engine',
         'bahasa_pemrograman',
+        'ip_pointing',
         'status_aplikasi',       // Aktif / Tidak Aktif
         'pengelola',
         'ket_pembangunan',

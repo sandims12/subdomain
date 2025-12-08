@@ -127,21 +127,29 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                 </dd>
+                                {{-- IP Pointing --}}
+                                <dt class="col-sm-4 text-muted small">IP Pointing</dt>
+                                <dd class="col-sm-8">
+                                    {{ $sd?->ip_pointing ?? '-' }}
+                                </dd>
 
                                 <dt class="col-sm-4 text-muted small">Status Subdomain</dt>
                                 <dd class="col-sm-8">
                                     @php
-                                        $statusSub = strtolower($sd->status ?? '');
+                                        // pakai null-safe operator ?-> supaya aman kalau $sd = null
+                                        $statusSub = strtolower($sd?->status ?? '');
                                         $badgeStatusSub = match($statusSub) {
-                                            'aktif'   => 'success',
-                                            'pending' => 'info text-dark',
-                                            'nonaktif'=> 'secondary',
-                                            default   => 'secondary',
+                                            'disetujui'       => 'success',
+                                            'menunggu'        => 'info text-dark',
+                                            'tidak disetujui' => 'secondary',
+                                            default           => 'secondary',
                                         };
                                     @endphp
                                     <span class="badge bg-{{ $badgeStatusSub }} rounded-pill px-3">
-                                        {{ ucfirst($sd->status ?? 'Belum Aktif') }}
+                                        {{ $statusSub ? ucwords($statusSub) : 'Belum Disetujui' }}
                                     </span>
+
+
                                 </dd>
 
                                 <dt class="col-sm-4 text-muted small">Kondisi</dt>
@@ -344,13 +352,59 @@
 
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label class="form-label fw-semibold">Status Permohonan</label>
-                            <select name="status" class="form-select shadow-sm" required>
-                                <option value="menunggu"  {{ $permohonan->status == 'menunggu'  ? 'selected' : '' }}>Menunggu</option>
-                                <option value="disetujui" {{ $permohonan->status == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                                <option value="ditolak"   {{ $permohonan->status == 'ditolak'   ? 'selected' : '' }}>Ditolak</option>
-                            </select>
+                            <label class="form-label fw-semibold d-block">Status Permohonan</label>
+
+                            <div class="d-flex align-items-center gap-3">
+                                {{-- ✅ DISETUJUI --}}
+                                <div>
+                                    <input
+                                        type="radio"
+                                        class="btn-check"
+                                        name="status"
+                                        id="statusDisetujui"
+                                        value="disetujui"
+                                        autocomplete="off"
+                                        {{ $permohonan->status == 'disetujui' ? 'checked' : '' }}
+                                        required
+                                    >
+                                    <label
+                                        class="btn btn-outline-success rounded-circle d-flex align-items-center justify-content-center"
+                                        style="width: 42px; height: 42px;"
+                                        for="statusDisetujui"
+                                        title="Setujui permohonan"
+                                    >
+                                        <i class="bi bi-check-lg"></i>
+                                    </label>
+                                </div>
+
+                                {{-- ❌ DITOLAK --}}
+                                <div>
+                                    <input
+                                        type="radio"
+                                        class="btn-check"
+                                        name="status"
+                                        id="statusDitolak"
+                                        value="ditolak"
+                                        autocomplete="off"
+                                        {{ $permohonan->status == 'ditolak' ? 'checked' : '' }}
+                                        required
+                                    >
+                                    <label
+                                        class="btn btn-outline-danger rounded-circle d-flex align-items-center justify-content-center"
+                                        style="width: 42px; height: 42px;"
+                                        for="statusDitolak"
+                                        title="Tolak permohonan"
+                                    >
+                                        <i class="bi bi-x-lg"></i>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <small class="text-muted d-block mt-2">
+                                Pilih salah satu sebelum menyimpan perubahan.
+                            </small>
                         </div>
+
 
                         <div class="col-md-8 mb-3">
                             <label class="form-label fw-semibold">Keterangan Admin (opsional)</label>

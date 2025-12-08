@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->enum('vendor', ['iya', 'tidak']);
             $table->string('nama_vendor')->nullable();
             $table->string('file_pengajuan')->nullable();
-            $table->enum('status', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu');
+            $table->enum('status', ['draft', 'menunggu', 'disetujui', 'ditolak'])->default('draft');
             $table->text('keterangan_admin')->nullable();
             $table->string('file_tindak_lanjut')->nullable();
             $table->timestamps();

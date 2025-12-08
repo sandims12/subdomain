@@ -17,9 +17,13 @@ class AdminTemplateController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'files.*' => 'required|mimes:pdf,doc,docx|max:2048'
-        ]);
+    $request->validate([
+        'files'   => 'required',
+        'files.*' => 'file|mimes:docx|max:2048', // HANYA DOCX, max 2MB
+    ], [
+        'files.*.mimes' => 'File harus berformat DOCX.',
+        'files.*.max'   => 'Ukuran file maksimal 2 MB per file.',
+    ]);
 
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
@@ -27,7 +31,8 @@ class AdminTemplateController extends Controller
 
                 Template::create([
                     'nama_file' => $file->getClientOriginalName(),
-                    'path' => $path
+                    'path' => $path,
+                    'jenis'     => $request->jenis
                 ]);
             }
         }

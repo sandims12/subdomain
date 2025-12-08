@@ -3,14 +3,14 @@
         <h3 class="fw-bold text-primary mb-4">Ajukan Permohonan Subdomain</h3>
 
         @if ($errors->any())
-    <div class="alert alert-danger small">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+        <div class="alert alert-danger small">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
 
         <form action="{{ route('skpd.permohonan.store') }}" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
             @csrf
@@ -63,17 +63,17 @@
                 </div>
 
                 <div class="row">
-    {{-- ANGGARAN (BARU) --}}
-    <div class="col-md-6 mb-3">
-        <label class="form-label">Anggaran</label>
-        <select name="anggaran" class="form-select">
-            <option value="">-- Pilih Anggaran --</option>
-            <option value="lebih dari 1 milyar">lebih dari 1 milyar</option>
-            <option value="lebih dari 500 juta < 1 milyar">lebih dari 500 juta &lt; 1 milyar</option>
-            <option value="lebih dari 100 juta < 500 juta">lebih dari 100 juta &lt; 500 juta</option>
-            <option value="kurang dari 100 juta">kurang dari 100 juta</option>
-        </select>
-    </div>
+                    {{-- ANGGARAN --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Anggaran</label>
+                        <select name="anggaran" class="form-select">
+                            <option value="">-- Pilih Anggaran --</option>
+                            <option value="lebih dari 1 milyar">lebih dari 1 milyar</option>
+                            <option value="lebih dari 500 juta < 1 milyar">lebih dari 500 juta &lt; 1 milyar</option>
+                            <option value="lebih dari 100 juta < 500 juta">lebih dari 100 juta &lt; 500 juta</option>
+                            <option value="kurang dari 100 juta">kurang dari 100 juta</option>
+                        </select>
+                    </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Tahun Penganggaran</label>
@@ -90,7 +90,6 @@
                             <option value="Offline">Offline</option>
                         </select>
                     </div>
-
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Dimanfaatkan Untuk Layanan</label>
@@ -130,16 +129,33 @@
                     </select>
                 </div>
 
+                {{-- BAHASA PEMROGRAMAN + LAINNYA --}}
                 <div class="mb-3">
                     <label class="form-label">Bahasa Pemrograman</label>
-                    <select name="bahasa_pemrograman" class="form-select">
+                    <select name="bahasa_pemrograman" id="bahasa_pemrograman_select" class="form-select">
                         <option value="">-- Pilih --</option>
                         <option value="PHP">PHP</option>
                         <option value="Java">Java</option>
                         <option value="Python">Python</option>
                         <option value="Javascript">Javascript</option>
                         <option value=".NET">.NET</option>
+                        <option value="Lainnya">Lainnya ...</option>
                     </select>
+
+                    {{-- input manual hanya muncul ketika pilih "Lainnya" --}}
+                    <input type="text"
+                           id="bahasa_pemrograman_custom"
+                           class="form-control mt-2 d-none"
+                           placeholder="Tulis bahasa pemrograman lain, contoh: Go, Ruby, Laravel, dll.">
+                </div>
+
+                {{-- IP POINTING --}}
+                <div class="mb-3">
+                    <label class="form-label">IP Pointing</label>
+                    <input type="text"
+                           name="ip_pointing"
+                           class="form-control"
+                           placeholder="Contoh: 123.123.123.123">
                 </div>
 
                 <div class="mb-3">
@@ -150,7 +166,7 @@
                 <div class="mb-3">
                     <label class="form-label">Keterangan Pembangunan</label>
                     <textarea name="ket_pembangunan" class="form-control" rows="3"
-                    placeholder="Contoh: Progres pengembangan, pihak yang terlibat, dll."></textarea>
+                              placeholder="Contoh: progres pengembangan aplikasi, status server/hosting, kebutuhan IP pointing, pihak yang terlibat, dll."></textarea>
                 </div>
 
                 <div class="mb-3">
@@ -203,13 +219,25 @@
 
             {{-- File --}}
             <div class="mb-3">
-                <label class="form-label fw-semibold">Upload File Pengajuan</label>
-                <input type="file" name="file_pengajuan" class="form-control">
+                <label class="form-label fw-semibold">Upload File Pengajuan (PDF saja, max 2MB)</label>
+                <input
+                    type="file"
+                    name="file_pengajuan"
+                    id="file_pengajuan"
+                    class="form-control"
+                    accept="application/pdf"
+                    required
+                >
+                <small id="file_error" class="text-danger fw-bold d-none"></small>
             </div>
 
             <div class="text-start mt-3">
-                <button type="submit" class="btn btn-primary btn-sm px-4">
+                <button type="submit" name="action" value="submit" class="btn btn-primary btn-sm px-4">
                     <i class="bi bi-send"></i> Kirim Permohonan
+                </button>
+
+                <button type="submit" name="action" value="draft" class="btn btn-outline-secondary btn-sm px-4">
+                    <i class="bi bi-file-earmark-text"></i> Simpan Draft
                 </button>
             </div>
         </form>
@@ -232,6 +260,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const namaView           = document.getElementById('nama_subdomain_view');
     const namaFull           = document.getElementById('nama_subdomain');
+
+    const bahasaSelect       = document.getElementById('bahasa_pemrograman_select');
+    const bahasaCustom       = document.getElementById('bahasa_pemrograman_custom');
 
     // --- fungsi bantu ---
     function resetVendor() {
@@ -318,8 +349,54 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // ================== BAHASA PEMROGRAMAN: LAINNYA ==================
+    function syncBahasaPemrograman() {
+        if (!bahasaSelect || !bahasaCustom) return;
+
+        if (bahasaSelect.value === 'Lainnya') {
+            bahasaCustom.classList.remove('d-none');
+            bahasaCustom.setAttribute('name', 'bahasa_pemrograman');
+            bahasaSelect.removeAttribute('name');
+        } else {
+            bahasaCustom.classList.add('d-none');
+            bahasaCustom.removeAttribute('name');
+            bahasaSelect.setAttribute('name', 'bahasa_pemrograman');
+        }
+    }
+
+    if (bahasaSelect) {
+        bahasaSelect.addEventListener('change', syncBahasaPemrograman);
+        // panggil sekali untuk state awal
+        syncBahasaPemrograman();
+    }
+
+    // ================== VALIDASI FILE PDF ==================
+    const fileInput = document.getElementById('file_pengajuan');
+    const fileError = document.getElementById('file_error');
+
+    if (fileInput && fileError) {
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            fileError.classList.add('d-none');
+            fileError.textContent = '';
+
+            if (!file) return;
+
+            if (file.type !== 'application/pdf') {
+                fileError.textContent = '❌ File harus berformat PDF (.pdf)';
+                fileError.classList.remove('d-none');
+                this.value = '';
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) { // 2 MB
+                fileError.textContent = '❌ Ukuran file maksimal 2 MB';
+                fileError.classList.remove('d-none');
+                this.value = '';
+                return;
+            }
+        });
+    }
 });
 </script>
-
-
-

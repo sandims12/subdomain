@@ -10,6 +10,7 @@
     {{-- STATISTIK --}}
     @php
         $total     = $riwayat->count();
+        $draft     = $riwayat->where('status', 'draft')->count();
         $menunggu  = $riwayat->where('status', 'menunggu')->count();
         $disetujui = $riwayat->where('status', 'disetujui')->count();
         $ditolak   = $riwayat->where('status', 'ditolak')->count();
@@ -25,6 +26,17 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="perm-card stat-draft">
+                <div class="perm-icon"><i class="bi bi-file-earmark-text"></i></div>
+                <div>
+                    <div class="perm-label">Draft</div>
+                    <div class="perm-value">{{ $draft }}</div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-3 col-sm-6">
             <div class="perm-card stat-waiting">
                 <div class="perm-icon"><i class="bi bi-hourglass-split"></i></div>
@@ -44,7 +56,7 @@
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="perm-card stat-reject">
+            <div class="perm-card stat-reject mt-2 mt-md-0">
                 <div class="perm-icon"><i class="bi bi-x-octagon"></i></div>
                 <div>
                     <div class="perm-label">Ditolak</div>
@@ -83,31 +95,66 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->category->name ?? '-' }}</td>
                                 <td>{{ $item->subcategory->name ?? '-' }}</td>
+
+                                {{-- STATUS --}}
                                 <td class="text-center">
-                                    @if($item->status == 'menunggu')
-                                        <span class="status-badge status-waiting"><i class="bi bi-hourglass-split me-1"></i>Menunggu</span>
+                                    @if($item->status == 'draft')
+                                        <span class="status-badge status-draft">
+                                            <i class="bi bi-file-earmark-text me-1"></i>Draft
+                                        </span>
+                                    @elseif($item->status == 'menunggu')
+                                        <span class="status-badge status-waiting">
+                                            <i class="bi bi-hourglass-split me-1"></i>Menunggu
+                                        </span>
                                     @elseif($item->status == 'disetujui')
-                                        <span class="status-badge status-approve"><i class="bi bi-check-circle me-1"></i>Disetujui</span>
+                                        <span class="status-badge status-approve">
+                                            <i class="bi bi-check-circle me-1"></i>Disetujui
+                                        </span>
                                     @elseif($item->status == 'ditolak')
-                                        <span class="status-badge status-reject"><i class="bi bi-x-octagon me-1"></i>Ditolak</span>
+                                        <span class="status-badge status-reject">
+                                            <i class="bi bi-x-octagon me-1"></i>Ditolak
+                                        </span>
                                     @endif
                                 </td>
+
                                 <td class="text-end text-muted">
                                     {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') }}
                                 </td>
 
                                 {{-- AKSI --}}
                                 <td class="text-end">
+                                    {{-- DETAIL SELALU BISA --}}
                                     <a href="{{ route('skpd.permohonan.show', $item->id) }}"
                                        class="btn btn-sm btn-outline-info rounded-pill px-3 me-1">
                                         <i class="bi bi-eye"></i> Detail
                                     </a>
 
-                                    @if($item->status === 'menunggu')
+                                    {{-- EDIT: boleh kalau bukan disetujui --}}
+                                    @if($item->status !== 'disetujui')
                                         <a href="{{ route('skpd.permohonan.edit', $item->id) }}"
                                            class="btn btn-sm btn-outline-primary rounded-pill px-3 me-1">
                                             <i class="bi bi-pencil"></i> Edit
                                         </a>
+                                    @else
+                                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1" disabled>
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </button>
+                                    @endif
+
+                                    {{-- KIRIM: khusus DRAFT -> MENUNGGU --}}
+                                    @if($item->status === 'draft')
+                                        <form action="{{ route('skpd.permohonan.kirim', $item->id) }}"
+                                              method="POST" class="d-inline"
+                                              onsubmit="return confirm('Kirim permohonan draft ini ke admin?')">
+                                            @csrf
+                                            <button class="btn btn-sm btn-success rounded-pill px-3 me-1">
+                                                <i class="bi bi-send"></i> Kirim
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    {{-- HAPUS: boleh untuk draft & menunggu --}}
+                                    @if(in_array($item->status, ['draft','menunggu']))
                                         <form action="{{ route('skpd.permohonan.destroy', $item->id) }}"
                                               method="POST" class="d-inline"
                                               onsubmit="return confirm('Hapus permohonan ini?')">
@@ -118,14 +165,12 @@
                                             </button>
                                         </form>
                                     @else
-                                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1" disabled>
-                                            <i class="bi bi-pencil"></i> Edit
-                                        </button>
                                         <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" disabled>
                                             <i class="bi bi-trash"></i> Hapus
                                         </button>
                                     @endif
                                 </td>
+
                             </tr>
                         @empty
                             <tr>
@@ -172,19 +217,21 @@
     .perm-label { font-size: 12px; text-transform: uppercase; color: #6c757d; margin-bottom: 3px; }
     .perm-value { font-size: 22px; font-weight: 700; color: #222; }
 
-    .stat-total .perm-icon { background: #eaf1ff; color: #0d6efd; }
+    .stat-total  .perm-icon { background: #eaf1ff;  color: #0d6efd; }
+    .stat-draft  .perm-icon { background: #f1f3f5;  color: #6c757d; }
     .stat-waiting .perm-icon { background: #fff4d6; color: #c58a00; }
     .stat-approve .perm-icon { background: #d8fbe8; color: #15803d; }
-    .stat-reject .perm-icon { background: #ffe1e3; color: #c53030; }
+    .stat-reject  .perm-icon { background: #ffe1e3; color: #c53030; }
 
     .status-badge {
         font-size: 12px; font-weight: 600;
         padding: 6px 14px; border-radius: 999px;
         display: inline-flex; align-items: center;
     }
+    .status-draft   { background: #f1f3f5; color: #495057; }
     .status-waiting { background: #fff4d6; color: #c58a00; }
     .status-approve { background: #d8fbe8; color: #15803d; }
-    .status-reject { background: #ffe1e3; color: #c53030; }
+    .status-reject  { background: #ffe1e3; color: #c53030; }
 
     .table th { font-size: .85rem; text-transform: uppercase; color: #6c757d; letter-spacing: .5px; }
     .table td { font-size: .9rem; }

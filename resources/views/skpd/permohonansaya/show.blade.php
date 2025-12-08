@@ -115,6 +115,10 @@
               @endif
             </p>
 
+            <p><strong>IP Pointing:</strong>
+              {{ $sd?->ip_pointing ?? '-' }}
+            </p>
+
             <p><strong>Link Subdomain:</strong>
               @if(!empty($sd?->link))
                 <a href="{{ $sd->link }}" target="_blank"
@@ -150,16 +154,28 @@
         @endif
       </p>
 
-      {{-- FILE PENGAJUAN --}}
-      @if($permohonan->file_pengajuan)
-        <p><strong>File Pengajuan:</strong>
-          <a href="{{ asset('uploads/permohonan/' . $permohonan->file_pengajuan) }}"
-             target="_blank"
-             class="btn btn-sm btn-outline-primary rounded-pill">
-            <i class="bi bi-file-earmark"></i> Lihat File
-          </a>
-        </p>
-      @endif
+      {{-- FILE PENGAJUAN (PREVIEW PDF MINIMALIS) --}}
+<h6 class="fw-bold text-primary mb-2">
+    <i class="bi bi-file-earmark-pdf"></i> File Pengajuan
+</h6>
+
+@if($permohonan->file_pengajuan)
+    <div class="border rounded p-2 mb-3" style="background:#fafafa;">
+        <iframe 
+            src="{{ asset('uploads/permohonan/' . $permohonan->file_pengajuan) }}"
+            style="width:100%; height:350px; border:0; border-radius:8px;"
+        ></iframe>
+    </div>
+
+    <a href="{{ asset('uploads/permohonan/' . $permohonan->file_pengajuan) }}"
+       target="_blank"
+       class="btn btn-outline-primary btn-sm rounded-pill">
+        <i class="bi bi-box-arrow-up-right"></i> Buka PDF
+    </a>
+@else
+    <p class="text-muted fst-italic">Belum ada file pengajuan.</p>
+@endif
+
 
       {{-- BALASAN ADMIN --}}
       @if($permohonan->status != 'menunggu')

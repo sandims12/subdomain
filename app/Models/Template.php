@@ -9,5 +9,5 @@ class Template extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_file', 'path'];
+    protected $fillable = ['nama_file', 'path', 'jenis'];
 }

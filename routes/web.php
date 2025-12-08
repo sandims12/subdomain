@@ -101,6 +101,7 @@ Route::middleware(['auth', 'role:skpd'])
     Route::get('/permohonan/create', [SkpdPermohonanController::class, 'create'])->name('permohonan.create');
     Route::post('/permohonan', [SkpdPermohonanController::class, 'store'])->name('permohonan.store');
     Route::get('/permohonan', [SkpdPermohonanController::class, 'index'])->name('permohonan.index');
+    Route::post('/permohonan/{id}/kirim', [SkpdPermohonanController::class, 'kirim'])->name('permohonan.kirim');
     Route::get('/permohonan/{permohonan}/edit', [SkpdPermohonanController::class, 'edit'])->name('permohonan.edit');
     Route::put('/permohonan/{permohonan}', [SkpdPermohonanController::class, 'update'])->name('permohonan.update');
     Route::delete('/permohonan/{permohonan}', [SkpdPermohonanController::class, 'destroy'])->name('permohonan.destroy');

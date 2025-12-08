@@ -16,14 +16,15 @@
         </span>
     </div>
 
-    @php
-        $total      = $subdomain->count();
-        $aktif      = $subdomain->where('status', 'Aktif')->count();
-        $nonaktif   = $subdomain->where('status', 'Nonaktif')->count();
-        $pending    = $subdomain->where('status', 'Pending')->count(); // kalau mau dipakai nanti
-    @endphp
+@php
+    $total    = $subdomain->count();
+    $aktif    = $subdomain->where('status', 'disetujui')->count();
+    $nonaktif = $subdomain->where('status', 'tidak disetujui')->count();
+    $pending  = $subdomain->where('status', 'menunggu')->count();
+@endphp
 
-    {{-- KARTU RINGKASAN (3 kartu, full 1 baris di desktop) --}}
+
+    {{-- KARTU RINGKASAN --}}
     <div class="row g-3 mb-4">
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card shadow-sm border-0 rounded-4 h-100 summary-card">
@@ -55,8 +56,8 @@
             <div class="card shadow-sm border-0 rounded-4 h-100 summary-card border-start border-secondary border-3">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <div class="text-muted small">Nonaktif</div>
-                        <h4 class="fw-bold text-secondary mb-0">{{ $nonaktif }}</h4>
+                        <div class="text-muted small">Pending</div>
+                        <h4 class="fw-bold text-secondary mb-0">{{ $pending }}</h4>
                     </div>
                     <span class="icon-circle">
                         <i class="bi bi-slash-circle"></i>
@@ -70,136 +71,71 @@
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body">
 
-            {{-- FILTER STATUS DOMAIN --}}
-            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                    <span class="text-muted small me-1">Filter status domain:</span>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-secondary active btn-filter-status" data-status="">
-                            Semua
-                        </button>
-                        <button type="button" class="btn btn-outline-success btn-filter-status" data-status="Aktif">
-                            Aktif
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-filter-status" data-status="Nonaktif">
-                            Nonaktif
-                        </button>
-                        <button type="button" class="btn btn-outline-info btn-filter-status" data-status="Pending">
-                            Pending
-                        </button>
-                    </div>
-                    
-                    {{-- TOMBOL EXPORT EXCEL --}}
-            <div>
-                <a href="{{ route('admin.subdomain.export.excel') }}"
-                   class="btn btn-success btn-sm rounded-pill">
-                    <i class="bi bi-file-earmark-excel"></i> Export Excel
-                </a>
-            </div>
-                </div>
-            </div>
+            {{-- FILTER STATUS DOMAIN + EXPORT --}}
+            <div class="btn-group btn-group-sm" role="group">
+    <button type="button" class="btn btn-outline-secondary active btn-filter-status" data-status="">
+        Semua
+    </button>
+    <button type="button" class="btn btn-outline-success btn-filter-status" data-status="disetujui">
+        Disetujui
+    </button>
+    <button type="button" class="btn btn-outline-info btn-filter-status" data-status="menunggu">
+        Menunggu
+    </button>
+    <button type="button" class="btn btn-outline-secondary btn-filter-status" data-status="tidak disetujui">
+        Tidak Disetujui
+    </button>
+</div>
 
-            {{-- TABEL --}}
+
+            {{-- TABEL SEDERHANA --}}
             <div class="table-responsive">
                 <table class="table align-middle table-hover mb-0" id="subdomainTable" style="width: 100%;">
                     <thead class="bg-light text-uppercase small text-secondary">
                         <tr>
-                            <th>No</th>
+                            <th style="width: 60px;">No</th>
                             <th>Nama Subdomain</th>
                             <th>Nama Aplikasi</th>
-                            <th>Sifat</th>
-                            <th>Tahun</th>
-                            <th>Anggaran</th>
-                            <th>Layanan</th>
-                            <th>Platform OS</th>
-                            <th>Jenis Aplikasi</th>
-                            <th>Database</th>
-                            <th>Bahasa</th>
-                            <th>Status Aplikasi</th>
-                            <th>Pengelola</th>
-                            <th>Kondisi</th>
+                            <th>IP Pointing</th>
                             <th>Status Domain</th>
-                            <th>Link</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($subdomain as $index => $s)
                             <tr>
+                                {{-- No (diisi DataTables) --}}
                                 <td class="fw-semibold text-center"></td>
+
+                                {{-- Nama subdomain --}}
                                 <td class="fw-semibold text-primary">
                                     <i class="bi bi-circle-fill me-1 small text-success"></i>
                                     {{ $s->nama_subdomain }}
                                 </td>
+
+                                {{-- Nama aplikasi --}}
                                 <td>{{ $s->nama_aplikasi ?? '-' }}</td>
-                                <td>{{ $s->sifat ?? '-' }}</td>
+
+                                {{-- IP pointing --}}
                                 <td>
-                                    @if($s->tahun_penganggaran)
+                                    @if(!empty($s->ip_pointing))
                                         <span class="badge bg-light text-dark px-2 py-1 rounded-pill">
-                                            {{ $s->tahun_penganggaran }}
+                                            {{ $s->ip_pointing }}
                                         </span>
                                     @else
-                                        -
+                                        <span class="text-muted">-</span>
                                     @endif
                                 </td>
-                                <td>
-    @if($s->anggaran)
-        <span class="badge bg-info-subtle text-info px-2 py-1 rounded-pill">
-            {{ $s->anggaran }}
-        </span>
-    @else
-        <span class="text-muted">-</span>
-    @endif
-</td>
-                                <td>{{ $s->layanan ?? '-' }}</td>
-                                <td>{{ $s->platform_os ?? '-' }}</td>
-                                <td>{{ $s->jenis_aplikasi ?? '-' }}</td>
-                                <td>{{ $s->database_engine ?? '-' }}</td>
-                                <td>{{ $s->bahasa_pemrograman ?? '-' }}</td>
 
-                                {{-- STATUS APLIKASI --}}
-                                <td>
-                                    @php
-                                        $statusApp = strtolower($s->status_aplikasi);
-                                        $badgeApp = match($statusApp) {
-                                            'aktif' => 'bg-success text-white',
-                                            'tidak aktif' => 'bg-danger text-white',
-                                            default => 'bg-secondary text-white'
-                                        };
-                                    @endphp
-                                    <span class="badge {{ $badgeApp }} px-3 py-2 rounded-pill shadow-sm">
-                                        {{ ucfirst($s->status_aplikasi ?? 'Belum Ditetapkan') }}
-                                    </span>
-                                </td>
-
-                                {{-- PENGELOLA --}}
-                                <td>{{ $s->pengelola ?? '-' }}</td>
-
-                                {{-- KONDISI --}}
-                                <td>
-                                    @php
-                                        $kondisi = strtolower($s->kondisi);
-                                        $badgeKondisi = match($kondisi) {
-                                            'aktif' => 'bg-success text-white',
-                                            'nonaktif' => 'bg-warning text-dark fw-semibold',
-                                            'error' => 'bg-danger text-white',
-                                            default => 'bg-secondary text-white'
-                                        };
-                                    @endphp
-                                    <span class="badge {{ $badgeKondisi }} px-3 py-2 rounded-pill text-capitalize shadow-sm">
-                                        {{ $s->kondisi ?? 'Tidak diketahui' }}
-                                    </span>
-                                </td>
-
-                                {{-- STATUS DOMAIN --}}
+                                {{-- Status domain --}}
                                 <td>
                                     @php
                                         $statusDomain = strtolower($s->status);
                                         $badgeStatus = match($statusDomain) {
-                                            'aktif' => 'bg-success text-white',
-                                            'pending' => 'bg-info text-dark fw-semibold',
-                                            'nonaktif' => 'bg-secondary text-white',
-                                            default => 'bg-light text-dark border'
+                                            'disetujui'    => 'bg-success text-white',
+                                            'menunggu'  => 'bg-info text-dark fw-semibold',
+                                            'tidakdisetujui' => 'bg-secondary text-white',
+                                            default    => 'bg-light text-dark border'
                                         };
                                     @endphp
                                     <span class="badge {{ $badgeStatus }} px-3 py-2 rounded-pill shadow-sm domain-status-text">
@@ -207,27 +143,7 @@
                                     </span>
                                 </td>
 
-                                {{-- LINK --}}
-                                <td>
-                                    @if($s->link)
-                                        <div class="d-flex align-items-center gap-1">
-                                            <a href="{{ $s->link }}" target="_blank"
-                                               class="text-decoration-none fw-semibold text-primary">
-                                                {{ \Illuminate\Support\Str::limit($s->link, 25) }}
-                                            </a>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-light border copy-link-btn"
-                                                    data-link="{{ $s->link }}"
-                                                    title="Salin link">
-                                                <i class="bi bi-clipboard"></i>
-                                            </button>
-                                        </div>
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
-                                </td>
-
-                                {{-- AKSI --}}
+                                {{-- Aksi --}}
                                 <td class="text-center">
                                     <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
                                         <button type="button"
@@ -247,6 +163,7 @@
                                                 data-pengelola="{{ $s->pengelola ?? '-' }}"
                                                 data-kondisi="{{ $s->kondisi ?? '-' }}"
                                                 data-statusdomain="{{ $s->status ?? '-' }}"
+                                                data-ip="{{ $s->ip_pointing ?? '-' }}"
                                                 data-link="{{ $s->link ?? '-' }}">
                                             <i class="bi bi-eye"></i> Detail
                                         </button>
@@ -255,6 +172,7 @@
                                            class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
+
                                         <form action="{{ route('admin.subdomain.destroy', $s->id) }}"
                                               method="POST"
                                               onsubmit="return confirm('Yakin ingin menghapus subdomain ini?')">
@@ -269,7 +187,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="16" class="text-center text-muted py-4">
+                                <td colspan="6" class="text-center text-muted py-4">
                                     <i class="bi bi-info-circle"></i> Belum ada data subdomain.
                                 </td>
                             </tr>
@@ -333,6 +251,9 @@
             <dt class="col-sm-4">Status Domain</dt>
             <dd class="col-sm-8" id="detailStatusDomain"></dd>
 
+            <dt class="col-sm-4">IP Pointing</dt>
+            <dd class="col-sm-8" id="detailIp"></dd>
+
             <dt class="col-sm-4">Link</dt>
             <dd class="col-sm-8" id="detailLink"></dd>
         </dl>
@@ -355,21 +276,12 @@
 
 <script>
   $(function () {
-    // CARI INDEX KOLOM UNTUK FILTER (Status Domain / Kondisi)
+    // CARI INDEX KOLOM UNTUK FILTER (Status Domain)
     let STATUS_COL_INDEX = $('#subdomainTable thead th')
       .filter(function () {
         return $(this).text().trim() === 'Status Domain';
       })
       .index();
-
-    // Kalau "Status Domain" tidak ketemu, pakai kolom "Kondisi"
-    if (STATUS_COL_INDEX === -1) {
-      STATUS_COL_INDEX = $('#subdomainTable thead th')
-        .filter(function () {
-          return $(this).text().trim() === 'Kondisi';
-        })
-        .index();
-    }
 
     // INIT DATATABLE
     const table = $('#subdomainTable').DataTable({
@@ -378,10 +290,8 @@
       pageLength: 10,
       lengthMenu: [10, 25, 50, 100],
       columnDefs: [
-        // kolom "No" tidak bisa sort & tidak ikut search
-        { orderable: false, searchable: false, targets: 0 },
-        // kolom Link & Aksi tidak bisa sort
-        { orderable: false, targets: [-1, -2] }
+        // kolom No & Aksi tidak bisa sort/search
+        { orderable: false, searchable: false, targets: [0, 5] }
       ],
       language: {
         search: "🔍 Cari:",
@@ -394,7 +304,7 @@
       }
     });
 
-    // === PENOMORAN ULANG KOLUM "No" (SELALU MULAI 1) ===
+    // PENOMORAN ULANG KOLUM "No"
     table.on('order.dt search.dt draw.dt', function () {
       let i = 1;
       table
@@ -405,7 +315,7 @@
         });
     }).draw();
 
-    // FILTER STATUS (Status Domain / Kondisi)
+    // FILTER STATUS DOMAIN
     $('.btn-filter-status').on('click', function () {
       $('.btn-filter-status').removeClass('active');
       $(this).addClass('active');
@@ -413,15 +323,13 @@
       const status = $(this).data('status'); // "", "Aktif", "Nonaktif", "Pending"
 
       if (!status) {
-        // reset filter
         table.column(STATUS_COL_INDEX).search('', false, false).draw();
       } else {
-        // filter berdasarkan teks di kolom Status Domain/Kondisi
         table.column(STATUS_COL_INDEX).search(status, false, false).draw();
       }
     });
 
-    // COPY LINK
+    // COPY LINK (kalau mau dipakai lagi, bisa disesuaikan)
     $(document).on('click', '.copy-link-btn', function () {
       const link = $(this).data('link');
       if (!navigator.clipboard) {
@@ -452,6 +360,7 @@
       $('#detailPengelola').text($(this).data('pengelola'));
       $('#detailKondisi').text($(this).data('kondisi'));
       $('#detailStatusDomain').text($(this).data('statusdomain'));
+      $('#detailIp').text($(this).data('ip'));
 
       const link = $(this).data('link');
       if (link && link !== '-') {
@@ -466,9 +375,6 @@
     });
   });
 </script>
-
-
-
 
 <style>
   thead th { font-size: .8rem; letter-spacing: .5px; padding: .8rem; }
@@ -485,10 +391,7 @@
       overflow-x: auto;
   }
 
-  /* kartu ringkasan */
-  .summary-card {
-      transition: transform .2s ease, box-shadow .2s ease;
-  }
+  .summary-card { transition: transform .2s ease, box-shadow .2s ease; }
   .summary-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 8px 20px rgba(0,0,0,.08);
@@ -504,10 +407,7 @@
       font-size: 1rem;
   }
 
-  /* card hover */
-  .card {
-      border-radius: 1.25rem;
-  }
+  .card { border-radius: 1.25rem; }
 
   @media (max-width: 575.98px) {
       .dataTables_filter {

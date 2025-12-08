@@ -12,7 +12,7 @@
     {{-- Banner Logo + Nama User --}}
     <div class="container-fluid mt-2">
         <div class="alert alert-warning bg-white text-black text-center">
-            <img src="{{ asset('vendor/publish/imyu.png') }}"
+            <img src="{{ asset('images/reang.png') }}"
                  class="rounded-image"
                  width="200"
                  height="auto"
@@ -88,7 +88,7 @@
                     <div class="dash-stat-icon bg-primary-soft">
                         <i class="bi bi-hdd-network text-primary"></i>
                     </div>
-                    <p class="label">Subdomain Aktif</p>
+                    <p class="label">Total Subdomain</p>
                     <h4 class="value">{{ $subdomainAktif }}</h4>
                 </div>
             </div>

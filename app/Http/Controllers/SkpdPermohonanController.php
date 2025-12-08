@@ -26,105 +26,124 @@ class SkpdPermohonanController extends Controller
     }
 
     /** ======================== STORE ======================== */
-public function store(Request $request)
-{
-    // RULES
-    $rules = [
-        'category_id'    => 'required|exists:categories,id',
-        'subcategory_id' => 'required|string|exists:subcategories,name',
-        'vendor'         => 'required|in:iya,tidak',
-        'nama_vendor'    => 'nullable|required_if:vendor,iya|max:255',
+    public function store(Request $request)
+    {
+        $action = $request->input('action', 'submit'); // submit / draft
 
-        // file boleh kosong, kalau ada max 5 MB (tanpa cek tipe)
-        'file_pengajuan' => 'nullable|file|max:5120',
+        $rules = [
+            'category_id'    => 'required|exists:categories,id',
+            'subcategory_id' => 'required|string|exists:subcategories,name',
+            'vendor'         => 'required|in:iya,tidak',
+            'nama_vendor'    => 'nullable|required_if:vendor,iya|max:255',
 
-        'nama_subdomain' => 'nullable|string|max:100',
-        'nama_aplikasi'  => 'nullable|string|max:255',
-        'anggaran'       => 'nullable|string|in:lebih dari 1 milyar,lebih dari 500 juta < 1 milyar,lebih dari 100 juta < 500 juta,kurang dari 100 juta',
-        'sifat'          => 'nullable|in:Online,Offline',
-        'tahun_penganggaran' => 'nullable|digits:4',
-        'layanan'        => 'nullable|string',
-        'platform_os'    => 'nullable|string',
-        'jenis_aplikasi' => 'nullable|string',
-        'database_engine'=> 'nullable|string',
-        'bahasa_pemrograman' => 'nullable|string',
-        'pengelola'      => 'nullable|string',
-        'ket_pembangunan'=> 'nullable|string',
-        'kendala'        => 'nullable|string',
-        'tindak_lanjut'  => 'nullable|string',
+            'file_pengajuan' => 'nullable|file|max:5120',
 
-        'subjek'         => 'nullable|string',
-        'deskiprsi'      => 'nullable|string',
-        'lokasi'         => 'nullable|in:Indoor,Outdoor',
-    ];
+            'nama_subdomain' => 'nullable|string|max:100',
+            'nama_aplikasi'  => 'nullable|string|max:255',
+            'anggaran'       => 'nullable|string|in:lebih dari 1 milyar,lebih dari 500 juta < 1 milyar,lebih dari 100 juta < 500 juta,kurang dari 100 juta',
+            'sifat'          => 'nullable|in:Online,Offline',
+            'tahun_penganggaran' => 'nullable|digits:4',
+            'layanan'        => 'nullable|string',
+            'platform_os'    => 'nullable|string',
+            'jenis_aplikasi' => 'nullable|string',
+            'database_engine'=> 'nullable|string',
+            'bahasa_pemrograman' => 'nullable|string',
+            'ip_pointing'    => 'nullable|ip',
+            'pengelola'      => 'nullable|string',
+            'ket_pembangunan'=> 'nullable|string',
+            'kendala'        => 'nullable|string',
+            'tindak_lanjut'  => 'nullable|string',
 
-    // pakai default messages bawaan Laravel saja
-    $request->validate($rules);
+            'subjek'         => 'nullable|string',
+            'deskiprsi'      => 'nullable|string',
+            'lokasi'         => 'nullable|in:Indoor,Outdoor',
+        ];
 
-    $user        = Auth::user();
-    $subcategory = Subcategory::where('name', $request->subcategory_id)->first();
+        $request->validate($rules);
 
-    // Jaga-jaga kalau subkategori tidak ditemukan (harusnya tidak kejadian)
-    if (!$subcategory) {
-        return back()->withErrors(['subcategory_id' => 'Subkategori tidak ditemukan.'])->withInput();
+        $user        = Auth::user();
+        $subcategory = Subcategory::where('name', $request->subcategory_id)->first();
+
+        if (!$subcategory) {
+            return back()->withErrors(['subcategory_id' => 'Subkategori tidak ditemukan.'])->withInput();
+        }
+
+        $permohonan = new Permohonan();
+        $permohonan->skpd_id        = $user->id;
+        $permohonan->category_id    = $request->category_id;
+        $permohonan->subcategory_id = $subcategory->id;
+        $permohonan->vendor         = $request->vendor;
+        $permohonan->nama_vendor    = $request->nama_vendor;
+
+        // ⬇️ status permohonan: draft / menunggu
+        $permohonan->status = $action === 'draft' ? 'draft' : 'menunggu';
+
+        $isSubdomain = strtolower(str_replace(' ', '', $subcategory->name)) === 'subdomain';
+
+        if ($isSubdomain) {
+            $permohonan->nama_subdomain = $request->nama_subdomain;
+        } else {
+            $permohonan->subjek    = $request->subjek;
+            $permohonan->deskiprsi = $request->deskiprsi;
+            $permohonan->lokasi    = $request->lokasi;
+        }
+
+        if ($request->hasFile('file_pengajuan')) {
+            $file     = $request->file('file_pengajuan');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/permohonan'), $fileName);
+            $permohonan->file_pengajuan = $fileName;
+        }
+
+        $permohonan->save();
+
+        /*
+        |=================================================
+        |  SELAMA INI DATA SUBDOMAIN DISIMPAN DI SINI
+        |  BIARKAN TETAP DISIMPAN (DRAFT & SUBMIT),
+        |  SUPAYA FORM DRAFT TIDAK HILANG ISIANNYA
+        |=================================================
+        */
+        if ($isSubdomain) {
+            $subdomain = Subdomain::updateOrCreate(
+                ['permohonan_id' => $permohonan->id],
+                [
+                    'skpd_id'               => $user->id,
+                    'nama_subdomain'        => $request->nama_subdomain,
+                    'nama_aplikasi'         => $request->nama_aplikasi,
+                    'anggaran'              => $request->anggaran,
+                    'sifat'                 => $request->sifat,
+                    'tahun_penganggaran'    => $request->tahun_penganggaran,
+                    'layanan'               => $request->layanan,
+                    'platform_os'           => $request->platform_os,
+                    'jenis_aplikasi'        => $request->jenis_aplikasi,
+                    'database_engine'       => $request->database_engine,
+                    'bahasa_pemrograman'    => $request->bahasa_pemrograman,
+                    'ip_pointing'           => $request->ip_pointing,
+                    'pengelola'             => $request->pengelola,
+                    'ket_pembangunan'       => $request->ket_pembangunan,
+                    'kendala_pembangunan'   => $request->kendala,
+                    'rencana_tindak_lanjut' => $request->tindak_lanjut,
+                    // status domain di sini cukup 'menunggu' dulu,
+                    // nanti saat admin setujui kamu ubah di updateStatus()
+                    'status'                => 'menunggu',
+                    'kondisi'               => $request->filled('ip_pointing') ? 'aktif' : 'nonaktif',
+                ]
+            );
+        }
+
+        if ($action === 'draft') {
+            Alert::success('Tersimpan', 'Permohonan disimpan sebagai draft (belum dikirim ke admin).');
+        } else {
+            Alert::success('Berhasil', 'Permohonan berhasil dikirim ke admin.');
+        }
+
+        return redirect()->route('skpd.permohonan.index');
     }
 
-    $permohonan = new Permohonan();
-    $permohonan->skpd_id        = $user->id;
-    $permohonan->category_id    = $request->category_id;
-    $permohonan->subcategory_id = $subcategory->id;
-    $permohonan->vendor         = $request->vendor;
-    $permohonan->nama_vendor    = $request->nama_vendor;
-    $permohonan->status         = 'menunggu';
 
-    // cek apakah ini permohonan subdomain
-    $isSubdomain = strtolower(str_replace(' ', '', $subcategory->name)) === 'subdomain';
 
-    if ($isSubdomain) {
-        $permohonan->nama_subdomain = $request->nama_subdomain;
-    } else {
-        $permohonan->subjek    = $request->subjek;
-        $permohonan->deskiprsi = $request->deskiprsi;
-        $permohonan->lokasi    = $request->lokasi;
-    }
 
-    // simpan file pengajuan jika ada
-    if ($request->hasFile('file_pengajuan')) {
-        $file     = $request->file('file_pengajuan');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads/permohonan'), $fileName);
-        $permohonan->file_pengajuan = $fileName;
-    }
-
-    $permohonan->save();
-
-    // Kalau subdomain, sekalian buat record di tabel subdomain
-    if ($isSubdomain) {
-        $subdomain = new Subdomain();
-        $subdomain->skpd_id               = $user->id;
-        $subdomain->permohonan_id         = $permohonan->id;
-        $subdomain->nama_subdomain        = $request->nama_subdomain;
-        $subdomain->nama_aplikasi         = $request->nama_aplikasi;
-        $subdomain->anggaran              = $request->anggaran;
-        $subdomain->sifat                 = $request->sifat;
-        $subdomain->tahun_penganggaran    = $request->tahun_penganggaran;
-        $subdomain->layanan               = $request->layanan;
-        $subdomain->platform_os           = $request->platform_os;
-        $subdomain->jenis_aplikasi        = $request->jenis_aplikasi;
-        $subdomain->database_engine       = $request->database_engine;
-        $subdomain->bahasa_pemrograman    = $request->bahasa_pemrograman;
-        $subdomain->pengelola             = $request->pengelola;
-        $subdomain->ket_pembangunan       = $request->ket_pembangunan;
-        $subdomain->kendala_pembangunan   = $request->kendala;
-        $subdomain->rencana_tindak_lanjut = $request->tindak_lanjut;
-        $subdomain->status                = 'pending';
-        $subdomain->kondisi               = 'nonaktif';
-        $subdomain->save();
-    }
-
-    Alert::success('Berhasil', 'Permohonan berhasil dikirim.');
-    return redirect()->route('skpd.dashboard');
-}
 
     /** ========================= INDEX ======================= */
     public function index()
@@ -146,8 +165,9 @@ public function store(Request $request)
     {
         if ($permohonan->skpd_id !== Auth::id()) abort(403);
 
-        if ($permohonan->status !== 'menunggu') {
-            Alert::error('Gagal', 'Permohonan yang sudah diproses tidak dapat diedit.');
+        // Hanya yang DISETUJUI yang tidak boleh diubah
+        if ($permohonan->status === 'disetujui') {
+            Alert::error('Gagal', 'Permohonan yang sudah disetujui tidak dapat diedit.');
             return back();
         }
 
@@ -163,88 +183,158 @@ public function store(Request $request)
     }
 
     /** ========================= UPDATE (untuk SKPD) ====================== */
-public function update(Request $request, $id)
-{
-    $permohonan = Permohonan::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        $permohonan = Permohonan::findOrFail($id);
 
-    if ($permohonan->skpd_id !== Auth::id()) abort(403);
+        if ($permohonan->skpd_id !== Auth::id()) abort(403);
 
-    if ($permohonan->status !== 'menunggu') {
-        Alert::error('Gagal', 'Permohonan yang sudah diproses tidak dapat diperbarui.');
-        return back();
+        // action: submit / draft (saat edit draft, user bisa pilih "kirim")
+        $action = $request->input('action', 'submit');
+
+        // YANG TIDAK BOLEH DI-UPDATE HANYA YANG DISETUJUI
+        if ($permohonan->status === 'disetujui') {
+            Alert::error('Gagal', 'Permohonan yang sudah disetujui tidak dapat diperbarui.');
+            return back();
+        }
+
+        $rules = [
+            'category_id'    => 'required|exists:categories,id',
+            'subcategory_id' => 'required|string|exists:subcategories,name',
+            'vendor'         => 'required|in:iya,tidak',
+            'nama_vendor'    => 'nullable|required_if:vendor,iya|max:255',
+
+            'file_pengajuan' => 'nullable|file|max:5120',
+
+            'nama_subdomain' => 'nullable|string|max:100',
+            'nama_aplikasi'  => 'nullable|string|max:255',
+            'anggaran'       => 'nullable|string|in:lebih dari 1 milyar,lebih dari 500 juta < 1 milyar,lebih dari 100 juta < 500 juta,kurang dari 100 juta',
+            'sifat'          => 'nullable|in:Online,Offline',
+            'tahun_penganggaran' => 'nullable|digits:4',
+            'layanan'        => 'nullable|string',
+            'platform_os'    => 'nullable|string',
+            'jenis_aplikasi' => 'nullable|string',
+            'database_engine'=> 'nullable|string',
+            'bahasa_pemrograman' => 'nullable|string',
+            'ip_pointing'    => 'nullable|ip',
+            'pengelola'      => 'nullable|string',
+            'ket_pembangunan'=> 'nullable|string',
+            'kendala'        => 'nullable|string',
+            'tindak_lanjut'  => 'nullable|string',
+            'subjek'         => 'nullable|string',
+            'deskiprsi'      => 'nullable|string',
+            'lokasi'         => 'nullable|in:Indoor,Outdoor',
+        ];
+
+        $request->validate($rules);
+
+        $subcategory = Subcategory::where('name', $request->subcategory_id)->first();
+
+        if (!$subcategory) {
+            return back()
+                ->withErrors(['subcategory_id' => 'Subkategori tidak ditemukan.'])
+                ->withInput();
+        }
+
+        $permohonan->category_id    = $request->category_id;
+        $permohonan->subcategory_id = $subcategory->id;
+        $permohonan->vendor         = $request->vendor;
+        $permohonan->nama_vendor    = $request->nama_vendor;
+
+        $isSubdomain = strtolower(str_replace(' ', '', $subcategory->name)) === 'subdomain';
+
+        if ($isSubdomain) {
+            $permohonan->nama_subdomain = $request->nama_subdomain;
+        } else {
+            $permohonan->subjek    = $request->subjek;
+            $permohonan->deskiprsi = $request->deskiprsi;
+            $permohonan->lokasi    = $request->lokasi;
+        }
+
+        if ($request->hasFile('file_pengajuan')) {
+            $file     = $request->file('file_pengajuan');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/permohonan'), $fileName);
+            $permohonan->file_pengajuan = $fileName;
+        }
+
+        // kalau sebelumnya draft dan sekarang user klik submit → ubah ke menunggu
+        if ($permohonan->status === 'draft' && $action === 'submit') {
+            $permohonan->status = 'menunggu';
+        }
+
+        $permohonan->save();
+
+        /*
+         * ==============================
+         *  SINKRON DATA KE TABEL SUBDOMAIN
+         * ==============================
+         */
+        if ($isSubdomain) {
+            $subdomain = Subdomain::where('permohonan_id', $permohonan->id)->first();
+
+            if ($subdomain) {
+                $subdomain->nama_subdomain        = $request->nama_subdomain;
+                $subdomain->nama_aplikasi         = $request->nama_aplikasi;
+                $subdomain->anggaran              = $request->anggaran;
+                $subdomain->sifat                 = $request->sifat;
+                $subdomain->tahun_penganggaran    = $request->tahun_penganggaran;
+                $subdomain->layanan               = $request->layanan;
+                $subdomain->platform_os           = $request->platform_os;
+                $subdomain->jenis_aplikasi        = $request->jenis_aplikasi;
+                $subdomain->database_engine       = $request->database_engine;
+                $subdomain->bahasa_pemrograman    = $request->bahasa_pemrograman;
+                $subdomain->ip_pointing           = $request->ip_pointing;
+                $subdomain->pengelola             = $request->pengelola;
+                $subdomain->ket_pembangunan       = $request->ket_pembangunan;
+                $subdomain->kendala_pembangunan   = $request->kendala;
+                $subdomain->rencana_tindak_lanjut = $request->tindak_lanjut;
+
+                // kondisi tetap mengikuti IP
+                $subdomain->kondisi = $request->filled('ip_pointing') ? 'aktif' : 'nonaktif';
+
+                // kalau permohonan sebelumnya ditolak dan sekarang direvisi,
+                // kamu bisa reset status subdomain ke "menunggu"
+                if ($permohonan->status === 'ditolak') {
+                    $subdomain->status = 'menunggu';
+                }
+
+                $subdomain->save();
+            }
+        }
+
+        Alert::success('Berhasil', 'Permohonan berhasil diperbarui.');
+        return redirect()->route('skpd.permohonan.index');
     }
-
-    $rules = [
-        'category_id'    => 'required|exists:categories,id',
-        'subcategory_id' => 'required|string|exists:subcategories,name',
-        'vendor'         => 'required|in:iya,tidak',
-        'nama_vendor'    => 'nullable|required_if:vendor,iya|max:255',
-
-        'file_pengajuan' => 'nullable|file|max:5120',
-
-        'nama_subdomain' => 'nullable|string|max:100',
-        'nama_aplikasi'  => 'nullable|string|max:255',
-        'anggaran'       => 'nullable|string|in:lebih dari 1 milyar,lebih dari 500 juta < 1 milyar,lebih dari 100 juta < 500 juta,kurang dari 100 juta',
-        'sifat'          => 'nullable|in:Online,Offline',
-        'tahun_penganggaran' => 'nullable|digits:4',
-        'layanan'        => 'nullable|string',
-        'platform_os'    => 'nullable|string',
-        'jenis_aplikasi' => 'nullable|string',
-        'database_engine'=> 'nullable|string',
-        'bahasa_pemrograman' => 'nullable|string',
-        'pengelola'      => 'nullable|string',
-        'ket_pembangunan'=> 'nullable|string',
-        'kendala'        => 'nullable|string',
-        'tindak_lanjut'  => 'nullable|string',
-        'subjek'         => 'nullable|string',
-        'deskiprsi'      => 'nullable|string',
-        'lokasi'         => 'nullable|in:Indoor,Outdoor',
-    ];
-
-    $request->validate($rules);
-
-    $subcategory = Subcategory::where('name', $request->subcategory_id)->first();
-
-    if (!$subcategory) {
-        return back()->withErrors(['subcategory_id' => 'Subkategori tidak ditemukan.'])->withInput();
-    }
-
-    $permohonan->update([
-        'category_id'    => $request->category_id,
-        'subcategory_id' => $subcategory->id,
-        'vendor'         => $request->vendor,
-        'nama_vendor'    => $request->nama_vendor,
-    ]);
-
-    $isSubdomain = strtolower(str_replace(' ', '', $subcategory->name)) === 'subdomain';
-
-    if ($isSubdomain) {
-        $permohonan->nama_subdomain = $request->nama_subdomain;
-    } else {
-        $permohonan->subjek    = $request->subjek;
-        $permohonan->deskiprsi = $request->deskiprsi;
-        $permohonan->lokasi    = $request->lokasi;
-    }
-
-    if ($request->hasFile('file_pengajuan')) {
-        $file     = $request->file('file_pengajuan');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads/permohonan'), $fileName);
-        $permohonan->file_pengajuan = $fileName;
-    }
-
-    $permohonan->save();
-
-    Alert::success('Berhasil', 'Permohonan berhasil diperbarui.');
-    return redirect()->route('skpd.permohonan.index');
-}
-
 
     public function show($id)
     {
-        $permohonan = Permohonan::with(['skpd', 'category', 'subcategory', 'subdomain'])->findOrFail($id);
+        $permohonan = Permohonan::with(['skpd', 'category', 'subcategory', 'subdomain'])
+            ->findOrFail($id);
+
         return view('skpd.permohonansaya.show', compact('permohonan'));
     }
+
+
+    //DRAFT
+    public function kirim($id)
+{
+    // hanya boleh kirim permohonan miliknya sendiri
+    $permohonan = Permohonan::where('skpd_id', Auth::id())->findOrFail($id);
+
+    // hanya status draft yang boleh dikirim
+    if ($permohonan->status !== 'draft') {
+        Alert::error('Gagal', 'Hanya permohonan dengan status draft yang dapat dikirim.');
+        return back();
+    }
+
+    $permohonan->status = 'menunggu';
+    $permohonan->save();
+
+    Alert::success('Berhasil', 'Permohonan draft berhasil dikirim ke admin.');
+    return redirect()->route('skpd.permohonan.index');
+}
+
 
     /** ========================= UPDATE STATUS (ADMIN) ====================== */
     public function updateStatus(Request $request, $id)
@@ -299,7 +389,8 @@ public function update(Request $request, $id)
     {
         if ($permohonan->skpd_id !== Auth::id()) abort(403);
 
-        if ($permohonan->status !== 'menunggu') {
+        // Yang boleh dihapus: draft & menunggu
+        if (!in_array($permohonan->status, ['draft', 'menunggu'])) {
             Alert::error('Gagal', 'Permohonan yang sudah diproses tidak dapat dihapus.');
             return back();
         }

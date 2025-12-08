@@ -7,78 +7,52 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SubdomainExport;
 
-
 class AdminSubdomainController extends Controller
 {
-    // Menampilkan daftar subdomain
+    // LIST (monitoring saja)
     public function index()
     {
-        // load relasi skpd supaya bisa dipakai di view
-        $subdomain = Subdomain::with('skpd')->latest()->get();
+        $subdomain = Subdomain::with(['skpd', 'permohonan'])
+            ->whereHas('permohonan', function ($q) {
+                // hanya tampil kalau status permohonannya BUKAN draft
+                $q->where('status', '!=', 'draft');
+            })
+            ->latest()
+            ->get();
 
         return view('admin.subdomain.index', compact('subdomain'));
     }
 
+    // EXPORT EXCEL
     public function exportExcel()
-{
-    return Excel::download(new SubdomainExport, 'data-subdomain.xlsx');
-}
+    {
+        return Excel::download(new SubdomainExport, 'data-subdomain.xlsx');
+    }
 
-
-    // Menampilkan form untuk membuat subdomain baru
+    // ==== TIDAK DIPERBOLEHKAN ====
     public function create()
     {
-        return view('admin.subdomain.create');
+        abort(403, 'Admin tidak diizinkan membuat subdomain secara manual.');
     }
 
-    // Menyimpan data subdomain baru
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_subdomain' => 'required|string|max:255',
-            'skpd_id' => 'required|exists:users,id',
-            'kondisi' => 'required|in:aktif,nonaktif,error',
-        ]);
-
-        Subdomain::create([
-            'skpd_id' => $request->skpd_id,
-            'nama_subdomain' => $request->nama_subdomain,
-            'kondisi' => $request->kondisi,
-        ]);
-
-        return redirect()->route('admin.subdomain.index')->with('success', 'Subdomain berhasil dibuat!');
+        abort(403, 'Admin tidak diizinkan membuat subdomain secara manual.');
     }
 
-    // Menampilkan form untuk mengedit data subdomain
     public function edit($id)
     {
-        $subdomain = Subdomain::findOrFail($id);
-        return view('admin.subdomain.edit', compact('subdomain'));
+        abort(403, 'Admin tidak diizinkan mengedit subdomain.');
     }
 
-    // Update data subdomain
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nama_subdomain' => 'required|string|max:255',
-            'kondisi' => 'required|in:aktif,nonaktif,error',
-        ]);
-
-        $subdomain = Subdomain::findOrFail($id);
-        $subdomain->update([
-            'nama_subdomain' => $request->nama_subdomain,
-            'kondisi' => $request->kondisi,
-        ]);
-
-        return redirect()->route('admin.subdomain.index')->with('success', 'Subdomain berhasil diperbarui!');
+        abort(403, 'Admin tidak diizinkan mengedit subdomain.');
     }
 
-    // Menghapus subdomain
     public function destroy($id)
     {
-        $subdomain = Subdomain::findOrFail($id);
-        $subdomain->delete();
-
-        return redirect()->route('admin.subdomain.index')->with('success', 'Subdomain berhasil dihapus!');
+        abort(403, 'Admin tidak diizinkan menghapus subdomain.');
     }
 }
+

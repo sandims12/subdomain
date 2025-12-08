@@ -2,11 +2,11 @@
 
     {{-- LOGO ADMIN --}}
     <div class="text-center mb-4">
-        <img src="{{ asset('images/reang.png') }}" 
+        <img src="{{ asset('vendor/publish/imyu.png') }}" 
              alt="Logo Admin" 
              class="img-fluid mb-2"
              style="height: 60px;">
-        <h5 class="fw-bold text-primary mt-1 mb-0">ADMIN REANG SEGALENGKO</h5>
+        <h5 class="fw-bold text-primary mt-1 mb-0">ADMIN</h5>
     </div>
 
     {{-- MENU --}}
