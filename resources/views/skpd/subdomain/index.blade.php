@@ -59,22 +59,22 @@
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-body">
 
-                {{-- Filter kondisi sederhana (opsional) --}}
+                {{-- Filter status --}}
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                     <div class="d-flex flex-wrap align-items-center gap-2">
-                        <span class="text-muted small">Filter kondisi:</span>
+                        <span class="text-muted small">Filter status:</span>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-secondary active btn-filter-kondisi" data-kondisi="">
+                            <button type="button" class="btn btn-outline-secondary active btn-filter-status" data-status="">
                                 Semua
                             </button>
-                            <button type="button" class="btn btn-outline-success btn-filter-kondisi" data-kondisi="aktif">
-                                Aktif
+                            <button type="button" class="btn btn-outline-info btn-filter-status" data-status="Menunggu">
+                                Menunggu
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-filter-kondisi" data-kondisi="nonaktif">
-                                Nonaktif
+                            <button type="button" class="btn btn-outline-success btn-filter-status" data-status="Setuju">
+                                Setuju
                             </button>
-                            <button type="button" class="btn btn-outline-danger btn-filter-kondisi" data-kondisi="error">
-                                Error
+                            <button type="button" class="btn btn-outline-danger btn-filter-status" data-status="Tidak Setuju">
+                                Tidak Setuju
                             </button>
                         </div>
                     </div>
@@ -86,30 +86,45 @@
                             <tr class="text-uppercase small text-secondary">
                                 <th style="width: 60px;">No</th>
                                 <th>Nama Subdomain</th>
-                                <th style="width: 150px;">Kondisi</th>
+                                <th style="width: 150px;">Status</th>
                                 <th style="width: 180px;">Tanggal Dibuat</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($subdomain as $index => $s)
                                 <tr>
+                                    {{-- No (diisi otomatis oleh DataTables) --}}
                                     <td class="text-center fw-semibold"></td>
+
+                                    {{-- Nama Subdomain --}}
                                     <td>{{ $s->nama_subdomain }}</td>
+
+                                    {{-- Status (Menunggu / Setuju / Tidak Setuju) --}}
                                     <td class="text-nowrap">
-                                        @if ($s->kondisi === 'aktif')
-                                            <span class="badge bg-success px-3 py-2 rounded-pill text-capitalize">
-                                                Aktif
+                                        @php
+                                            $statusPermohonan = strtolower($s->permohonan->status ?? '');
+                                        @endphp
+
+                                        @if ($statusPermohonan === 'menunggu')
+                                            <span class="badge bg-info text-dark px-3 py-2 rounded-pill">
+                                                Menunggu
                                             </span>
-                                        @elseif ($s->kondisi === 'nonaktif')
-                                            <span class="badge bg-secondary px-3 py-2 rounded-pill text-capitalize">
-                                                Nonaktif
+                                        @elseif ($statusPermohonan === 'disetujui')
+                                            <span class="badge bg-success px-3 py-2 rounded-pill">
+                                                Setuju
+                                            </span>
+                                        @elseif ($statusPermohonan === 'ditolak')
+                                            <span class="badge bg-danger px-3 py-2 rounded-pill">
+                                                Tidak Setuju
                                             </span>
                                         @else
-                                            <span class="badge bg-danger px-3 py-2 rounded-pill text-capitalize">
-                                                Error
+                                            <span class="badge bg-light text-muted px-3 py-2 rounded-pill">
+                                                -
                                             </span>
                                         @endif
                                     </td>
+
+                                    {{-- Tanggal Dibuat --}}
                                     <td>
                                         {{ $s->created_at ? $s->created_at->format('d M Y') : '-' }}
                                     </td>
@@ -173,17 +188,16 @@
                 });
         }).draw();
 
-        // Filter kondisi (dari badge di kolom ke-2)
-        $('.btn-filter-kondisi').on('click', function () {
-            $('.btn-filter-kondisi').removeClass('active');
+        // Filter status (kolom ke-2 index=2)
+        $('.btn-filter-status').on('click', function () {
+            $('.btn-filter-status').removeClass('active');
             $(this).addClass('active');
 
-            const kondisi = $(this).data('kondisi'); // '', 'aktif', 'nonaktif', 'error'
-            if (!kondisi) {
+            const status = $(this).data('status'); // '', 'Menunggu', 'Setuju', 'Tidak Setuju'
+            if (!status) {
                 table.column(2).search('', true, false).draw();
             } else {
-                // gunakan regex agar case-insensitive & cocokkan kata
-                table.column(2).search(kondisi, true, false).draw();
+                table.column(2).search(status, true, false).draw();
             }
         });
     });

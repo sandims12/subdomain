@@ -18,6 +18,7 @@
                     <tr>
                         <th>NO</th>
                         <th>Nama SKPD</th>
+                        <th>Kedinasan</th>
                         <th>Email</th>
                         <th>Tanggal Terdaftar</th>
                         <th class="text-center">Aksi</th>
@@ -28,6 +29,7 @@
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $user->name }}</td>
+                            <td>{{ $user->kedinasan ?? '-' }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->created_at->format('d M Y') }}</td>
                             <td class="text-center">

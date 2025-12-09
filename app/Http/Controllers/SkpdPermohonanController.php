@@ -99,9 +99,6 @@ class SkpdPermohonanController extends Controller
 
         /*
         |=================================================
-        |  SELAMA INI DATA SUBDOMAIN DISIMPAN DI SINI
-        |  BIARKAN TETAP DISIMPAN (DRAFT & SUBMIT),
-        |  SUPAYA FORM DRAFT TIDAK HILANG ISIANNYA
         |=================================================
         */
         if ($isSubdomain) {
@@ -133,7 +130,7 @@ class SkpdPermohonanController extends Controller
         }
 
         if ($action === 'draft') {
-            Alert::success('Tersimpan', 'Permohonan disimpan sebagai draft (belum dikirim ke admin).');
+            Alert::success('Tersimpan', 'Permohonan disimpan sebagai draft');
         } else {
             Alert::success('Berhasil', 'Permohonan berhasil dikirim ke admin.');
         }

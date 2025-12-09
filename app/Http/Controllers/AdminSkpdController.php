@@ -12,6 +12,14 @@ class AdminSkpdController extends Controller
     /**
      * Menampilkan halaman Data SKPD
      */
+        private array $kedinasanOptions = [
+        'Dinas Pendidikan',
+        'Dinas Kesehatan',
+        'Dinas PUPR',
+        'Dinas Perhubungan',
+        'Sekretariat Daerah',
+    ];
+
     public function index()
     {
         $skpd = User::where('role', 'skpd')->latest()->get(); // Ambil data SKPD berdasarkan role
@@ -23,70 +31,98 @@ class AdminSkpdController extends Controller
      */
     public function create()
     {
-        return view('admin.skpd.create'); // Tampilkan form untuk tambah SKPD
+        $kedinasan = $this->kedinasanOptions;
+        return view('admin.skpd.create', compact('kedinasan'));
     }
 
     /**
      * Menyimpan data SKPD yang baru
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email', // Pastikan email unik
-            'password' => 'required|string|min:8|confirmed', // Password minimal 8 karakter
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'kedinasan' => [
+            'required',
+            function ($attribute, $value, $fail) {
+                // hitung berapa akun skpd untuk kedinasan ini
+                $count = User::where('role', 'skpd')
+                    ->where('kedinasan', $value)
+                    ->count();
 
-        // Menyimpan data SKPD baru ke database
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password), // Encrypt password
-            'role' => 'skpd', // Pastikan role SKPD
-        ]);
+                if ($count >= 2) {
+                    $fail('Kedinasan ini sudah memiliki 2 akun SKPD.');
+                }
+            },
+        ],
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
 
-        // Menampilkan pesan sukses
-        Alert::success('Berhasil', 'SKPD berhasil ditambahkan!');
-        return redirect()->route('admin.skpd.index'); // Kembali ke halaman daftar SKPD
-    }
+    User::create([
+        'kedinasan' => $request->kedinasan,
+        'name'      => $request->name,
+        'email'     => $request->email,
+        'password'  => Hash::make($request->password),
+        'role'      => 'skpd',
+    ]);
+
+    Alert::success('Berhasil', 'SKPD berhasil ditambahkan!');
+    return redirect()->route('admin.skpd.index');
+}
+
 
     /**
      * Menampilkan form untuk edit SKPD
      */
-    public function edit($id)
-    {
-        $skpd = User::findOrFail($id); // Ambil data SKPD berdasarkan ID
-        return view('admin.skpd.edit', compact('skpd')); // Tampilkan form edit
-    }
+public function edit($id)
+{
+    $skpd = User::findOrFail($id);
+    $kedinasan = $this->kedinasanOptions;
+
+    return view('admin.skpd.edit', compact('skpd', 'kedinasan'));
+}
+
 
     /**
      * Mengupdate data SKPD
      */
-    public function update(Request $request, $id)
-    {
-        $skpd = User::findOrFail($id); // Ambil data SKPD berdasarkan ID
+public function update(Request $request, $id)
+{
+    $skpd = User::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $skpd->id, // Periksa email, kecuali milik SKPD yang sama
-            'password' => 'nullable|string|min:6|confirmed', // Password bisa kosong, jika tidak diubah
-        ]);
+    $request->validate([
+        'kedinasan' => [
+            'required',
+            function ($attribute, $value, $fail) use ($skpd) {
+                $query = User::where('role', 'skpd')
+                    ->where('kedinasan', $value)
+                    ->where('id', '!=', $skpd->id); // jangan hitung diri sendiri
 
-        // Update data SKPD
-        $skpd->name = $request->name;
-        $skpd->email = $request->email;
+                if ($query->count() >= 2) {
+                    $fail('Kedinasan ini sudah memiliki 2 akun SKPD.');
+                }
+            },
+        ],
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $skpd->id,
+        'password' => 'nullable|string|min:6|confirmed',
+    ]);
 
-        // Jika password diubah, simpan password yang baru
-        if ($request->filled('password')) {
-            $skpd->password = Hash::make($request->password);
-        }
+    $skpd->kedinasan = $request->kedinasan;
+    $skpd->name = $request->name;
+    $skpd->email = $request->email;
 
-        $skpd->save(); // Simpan perubahan
-
-        // Menampilkan pesan sukses
-        Alert::success('Berhasil', 'Data SKPD berhasil diperbarui!');
-        return redirect()->route('admin.skpd.index');
+    if ($request->filled('password')) {
+        $skpd->password = Hash::make($request->password);
     }
+
+    $skpd->save();
+
+    Alert::success('Berhasil', 'Data SKPD berhasil diperbarui!');
+    return redirect()->route('admin.skpd.index');
+}
+
 
     /**
      * Menghapus data SKPD

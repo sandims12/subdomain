@@ -10,13 +10,24 @@
     <div class="card p-4 shadow-sm border-0 mb-4">
         <form action="{{ route('admin.template.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Jenis Template</label>
-                <select name="jenis" class="form-select" required>
-                    <option value="subdomain">Surat Permohonan Subdomain</option>
-                    <option value="non_subdomain">Surat Permohonan Non Subdomain</option>
-                </select>
-            </div>
+<div class="mb-3">
+    <label class="form-label fw-semibold">Jenis Template</label>
+    <select name="jenis" class="form-control" required>
+        <option value="">-- Pilih Jenis Template --</option>
+        <option value="subdomain"
+            {{ old('jenis') == 'subdomain' ? 'selected' : '' }}>
+            Surat Permohonan Subdomain
+        </option>
+        <option value="non_subdomain"
+            {{ old('jenis') == 'non_subdomain' ? 'selected' : '' }}>
+            Surat Permohonan Non Subdomain
+        </option>
+    </select>
+    @error('jenis')
+        <small class="text-danger d-block mt-1">{{ $message }}</small>
+    @enderror
+</div>
+
 
             <div class="mb-3">
                 <label class="form-label fw-semibold">Pilih File Template</label>

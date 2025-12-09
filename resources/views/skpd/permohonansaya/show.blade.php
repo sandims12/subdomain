@@ -145,13 +145,25 @@
         <i class="bi bi-clipboard-check"></i> Status Permohonan
       </h6>
       <p>
-        @if($permohonan->status == 'disetujui')
-          <span class="badge bg-success">Disetujui</span>
-        @elseif($permohonan->status == 'menunggu')
-          <span class="badge bg-warning text-dark">Menunggu</span>
-        @else
-          <span class="badge bg-danger">Ditolak</span>
-        @endif
+{{-- Status Permohonan --}}
+@php
+    $status = $permohonan->status;
+@endphp
+
+@if ($status === 'draft')
+    {{-- tampilkan tanda "-" untuk draft --}}
+    <span class="badge bg-secondary">-</span>
+@elseif ($status === 'menunggu')
+    <span class="badge bg-info text-dark">Menunggu</span>
+@elseif ($status === 'disetujui')
+    <span class="badge bg-success">Disetujui</span>
+@elseif ($status === 'ditolak')
+    <span class="badge bg-danger">Ditolak</span>
+@else
+    {{-- fallback kalau ada status aneh --}}
+    <span class="badge bg-secondary">-</span>
+@endif
+
       </p>
 
       {{-- FILE PENGAJUAN (PREVIEW PDF MINIMALIS) --}}

@@ -11,29 +11,32 @@ class SkpdSubdomainController extends Controller
     /**
      * Tampilkan daftar subdomain milik SKPD yang sedang login.
      */
-    public function index()
-    {
-        $user = Auth::user();
+public function index()
+{
+    $user = Auth::user();
 
-        // Ambil hanya subdomain yang dimiliki user SKPD ini
-        $subdomain = Subdomain::where('skpd_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+    $subdomain = Subdomain::with('permohonan')
+        ->where('skpd_id', $user->id)
+        ->whereHas('permohonan', function ($q) {
+            $q->where('status', '!=', 'draft');
+        })
+        ->latest()
+        ->get();
 
-        // Hitung statistik
-        $total    = $subdomain->count();
-        $aktif    = $subdomain->where('kondisi', 'aktif')->count();
-        $nonaktif = $subdomain->where('kondisi', 'nonaktif')->count();
-        $error    = $subdomain->where('kondisi', 'error')->count();
+    // Hitung statistik
+    $total    = $subdomain->count();
+    $aktif    = $subdomain->where('kondisi', 'aktif')->count();
+    $nonaktif = $subdomain->where('kondisi', 'nonaktif')->count();
+    $error    = $subdomain->where('kondisi', 'error')->count();
 
-        // Pakai wrapper SKPD seperti halaman lain
-        return view('skpd.layouts.wrapper', [
-            'content'   => 'skpd.subdomain.index',
-            'subdomain' => $subdomain,
-            'total'     => $total,
-            'aktif'     => $aktif,
-            'nonaktif'  => $nonaktif,
-            'error'     => $error,
-        ]);
-    }
+    return view('skpd.layouts.wrapper', [
+        'content'   => 'skpd.subdomain.index',
+        'subdomain' => $subdomain,
+        'total'     => $total,
+        'aktif'     => $aktif,
+        'nonaktif'  => $nonaktif,
+        'error'     => $error,
+    ]);
+}
+
 }

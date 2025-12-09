@@ -10,19 +10,47 @@
                 @csrf
                 @method('PUT')
 
+                {{-- Pilihan Kedinasan --}}
+                <div class="mb-3">
+                    <label class="form-label">Kedinasan</label>
+                    <select name="kedinasan" class="form-control" required>
+                        <option value="">-- Pilih Kedinasan --</option>
+                        @foreach ($kedinasan as $kd)
+                            <option value="{{ $kd }}"
+                                {{ old('kedinasan', $skpd->kedinasan) == $kd ? 'selected' : '' }}>
+                                {{ $kd }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('kedinasan')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label">Nama SKPD</label>
-                    <input type="text" name="name" class="form-control" value="{{ $skpd->name }}" required>
+                    <input type="text" name="name" class="form-control"
+                           value="{{ old('name', $skpd->name) }}" required>
+                    @error('name')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ $skpd->email }}" required>
+                    <input type="email" name="email" class="form-control"
+                           value="{{ old('email', $skpd->email) }}" required>
+                    @error('email')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Password Baru (Opsional)</label>
                     <input type="password" name="password" class="form-control">
+                    @error('password')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
                 </div>
 
                 <div class="mb-3">
