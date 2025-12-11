@@ -195,6 +195,8 @@ class SkpdPermohonanController extends Controller
             return back();
         }
 
+        $oldStatus = $permohonan->status;
+
         $rules = [
             'category_id'    => 'required|exists:categories,id',
             'subcategory_id' => 'required|string|exists:subcategories,name',
@@ -255,10 +257,9 @@ class SkpdPermohonanController extends Controller
             $permohonan->file_pengajuan = $fileName;
         }
 
-        // kalau sebelumnya draft dan sekarang user klik submit → ubah ke menunggu
-        if ($permohonan->status === 'draft' && $action === 'submit') {
-            $permohonan->status = 'menunggu';
-        }
+ if (in_array($oldStatus, ['draft', 'ditolak']) && $action === 'submit') {
+        $permohonan->status = 'menunggu';
+    }
 
         $permohonan->save();
 
@@ -292,12 +293,12 @@ class SkpdPermohonanController extends Controller
 
                 // kalau permohonan sebelumnya ditolak dan sekarang direvisi,
                 // kamu bisa reset status subdomain ke "menunggu"
-                if ($permohonan->status === 'ditolak') {
-                    $subdomain->status = 'menunggu';
-                }
-
-                $subdomain->save();
+            if ($oldStatus === 'ditolak' && $permohonan->status === 'menunggu') {
+                $subdomain->status = 'menunggu';
             }
+
+            $subdomain->save();
+        }
         }
 
         Alert::success('Berhasil', 'Permohonan berhasil diperbarui.');

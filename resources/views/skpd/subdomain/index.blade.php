@@ -30,8 +30,8 @@
             <div class="col-md-3 col-6">
                 <div class="card shadow-sm summary-card border-0 rounded-4 h-100 border-start border-success border-3">
                     <div class="card-body text-center">
-                        <div class="text-muted small">Aktif</div>
-                        <div class="fs-3 fw-bold text-success">{{ $aktif }}</div>
+                        <div class="text-muted small">Disetujui</div>
+                        <div class="fs-3 fw-bold text-success">{{ $nonaktif }}</div>
                     </div>
                 </div>
             </div>
@@ -39,8 +39,8 @@
             <div class="col-md-3 col-6">
                 <div class="card shadow-sm summary-card border-0 rounded-4 h-100 border-start border-secondary border-3">
                     <div class="card-body text-center">
-                        <div class="text-muted small">Nonaktif</div>
-                        <div class="fs-3 fw-bold text-secondary">{{ $nonaktif }}</div>
+                        <div class="text-muted small">Menunggu</div>
+                        <div class="fs-3 fw-bold text-secondary">{{ $aktif }}</div>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
             <div class="col-md-3 col-6">
                 <div class="card shadow-sm summary-card border-0 rounded-4 h-100 border-start border-danger border-3">
                     <div class="card-body text-center">
-                        <div class="text-muted small">Error</div>
+                        <div class="text-muted small">Ditolak</div>
                         <div class="fs-3 fw-bold text-danger">{{ $error }}</div>
                     </div>
                 </div>

@@ -43,7 +43,7 @@
             <div class="card shadow-sm border-0 rounded-4 h-100 summary-card border-start border-success border-3">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <div class="text-muted small">Aktif</div>
+                        <div class="text-muted small">Disetujui</div>
                         <h4 class="fw-bold text-success mb-0">{{ $aktif }}</h4>
                     </div>
                     <span class="icon-circle">

@@ -47,7 +47,7 @@
                                         <tr>
                                             <td class="text-center fw-semibold">{{ $loop->iteration }}</td>
                                             <td>
-                                                <i class="bi bi-filetype-pdf text-danger me-1"></i>
+                                                <i class="bi bi-filetype-docx text-danger me-1"></i>
                                                 {{ $file->nama_file }}
                                             </td>
                                             <td>{{ optional($file->created_at)->translatedFormat('d M Y H:i') ?? '-' }}</td>
@@ -87,7 +87,7 @@
                                         <tr>
                                             <td class="text-center fw-semibold">{{ $loop->iteration }}</td>
                                             <td>
-                                                <i class="bi bi-filetype-pdf text-danger me-1"></i>
+                                                <i class="bi bi-filetype-docx text-danger me-1"></i>
                                                 {{ $file->nama_file }}
                                             </td>
                                             <td>{{ optional($file->created_at)->translatedFormat('d M Y H:i') ?? '-' }}</td>
