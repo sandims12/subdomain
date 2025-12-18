@@ -70,7 +70,10 @@
                 </h6>
                 <div class="ps-2 py-2 bg-white p-4 border rounded-3 shadow-sm-sm">
                     <dl class="row mb-0">
-                        <dt class="col-sm-3 text-muted small">Nama SKPD</dt>
+                        <dt class="col-sm-3 text-muted small">Kedinasan</dt>
+                        <dd class="col-sm-9">{{ $permohonan->skpd->kedinasan ?? '-' }}</dd>
+
+                        <dt class="col-sm-3 text-muted small">Nama User</dt>
                         <dd class="col-sm-9">{{ $permohonan->skpd->name ?? '-' }}</dd>
 
                         <dt class="col-sm-3 text-muted small">Menggunakan Vendor</dt>

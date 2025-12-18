@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <h3 class="fw-bold mb-4">Tambah SKPD</h3>
+    <h3 class="fw-bold mb-4">Tambah User</h3>
 
     <div class="card shadow-sm">
         <div class="card-body">

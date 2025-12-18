@@ -78,7 +78,6 @@
                                 <th>Nama File</th>
                                 <th style="width: 150px;">Jenis</th>
                                 <th style="width: 180px;">Diupload Pada</th>
-                                <th style="width: 120px;" class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,13 +101,6 @@
                                     </td>
                                     <td>
                                         {{ optional($file->created_at)->translatedFormat('d M Y H:i') ?? '-' }}
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="{{ asset(\Storage::url($file->path)) }}"
-                                           target="_blank"
-                                           class="btn btn-sm btn-outline-primary rounded-pill">
-                                            <i class="bi bi-eye"></i> Lihat
-                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

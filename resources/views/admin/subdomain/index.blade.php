@@ -150,6 +150,7 @@
                                                 class="btn btn-sm btn-outline-info rounded-pill px-3 shadow-sm btn-detail"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#detailModal"
+                                                data-kedinasan="{{ $s->skpd->kedinasan ?? '-' }}"
                                                 data-nama="{{ $s->nama_subdomain }}"
                                                 data-aplikasi="{{ $s->nama_aplikasi ?? '-' }}"
                                                 data-sifat="{{ $s->sifat ?? '-' }}"
@@ -212,6 +213,10 @@
       </div>
       <div class="modal-body pt-0">
         <dl class="row mb-0 small">
+            <dt class="col-sm-4">Kedinasan</dt>         {{-- ⬅️ baru --}}
+            <dd class="col-sm-8" id="detailKedinasan"></dd>  {{-- ⬅️ baru --}}
+
+
             <dt class="col-sm-4">Nama Subdomain</dt>
             <dd class="col-sm-8" id="detailNama"></dd>
 
@@ -347,6 +352,7 @@
 
     // DETAIL MODAL
     $(document).on('click', '.btn-detail', function () {
+    $('#detailKedinasan').text($(this).data('kedinasan'));
       $('#detailNama').text($(this).data('nama'));
       $('#detailAplikasi').text($(this).data('aplikasi'));
       $('#detailSifat').text($(this).data('sifat'));

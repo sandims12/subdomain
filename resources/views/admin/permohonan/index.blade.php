@@ -91,7 +91,8 @@
           <thead>
             <tr>
               <th>No</th>
-              <th>Nama SKPD</th>
+              <th>Kedinasan</th>
+              <th>Nama User</th>
               <th>Kategori</th>
               <th>Subkategori</th>
               <th>Status</th>
@@ -103,6 +104,7 @@
           @foreach($permohonan as $index => $item)
             <tr>
               <td>{{ $index + 1 }}</td>
+              <td>{{ $item->skpd->kedinasan ?? '-' }}</td>
               <td>{{ $item->skpd->name ?? '-' }}</td>
               <td>{{ $item->category->name ?? '-' }}</td>
               <td>{{ $item->subcategory->name ?? '-' }}</td>

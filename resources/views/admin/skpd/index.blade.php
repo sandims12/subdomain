@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="container-fluid">
-    <h3 class="fw-bold mb-1">Data SKPD</h3>
+    <h3 class="fw-bold mb-1">Data User</h3>
     <p class="text-muted mb-3" style="font-size:.85rem;">Klik judul kolom untuk mengurutkan.</p>
 
     <div class="mb-3 text-end">
         <a href="{{ route('admin.skpd.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Tambah SKPD
+            <i class="bi bi-plus-circle"></i> Tambah User
         </a>
     </div>
 

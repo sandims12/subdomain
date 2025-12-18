@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Nama SKPD</label>
+                    <label class="form-label">Nama User</label>
                     <input type="text" name="name" class="form-control"
                            value="{{ old('name', $skpd->name) }}" required>
                     @error('name')

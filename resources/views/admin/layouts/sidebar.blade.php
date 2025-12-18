@@ -24,7 +24,7 @@
             <a href="/admin/skpd"
                class="nav-link sidebar-link {{ request()->is('admin/skpd*') ? 'active' : '' }}">
                 <i class="bi bi-building me-2"></i>
-                <span>Data SKPD</span>
+                <span>Data User</span>
             </a>
         </li>
 
